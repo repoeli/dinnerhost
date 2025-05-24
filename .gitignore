@@ -4,6 +4,9 @@
 .env.production
 .env.development
 
+# Temporary/alternate README files
+README2.md
+
 # Python
 __pycache__/
 *.py[cod]
