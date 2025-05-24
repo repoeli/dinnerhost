@@ -443,15 +443,11 @@ async function handleCancelReservation() {
     showNotification('Reservation not found for cancellation', 'error');
     return;
   }
-    // Remove reservation
+  // Remove reservation
   reservations.splice(reservationIndex, 1);
   
   // Save changes to storage
-  await DataManager.saveData({
-    dinners,
-    reservations,
-    users
-  });
+  DataManager.saveAllGlobalData();
     // Close modal
   ModalManager.hide('cancelReservationModal');
   

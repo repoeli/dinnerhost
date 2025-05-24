@@ -7,6 +7,27 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Set up password validation for registration form
   setupPasswordValidation();
+  
+  // Set up login form event listener for registration page
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', handleRegistrationPageLogin);
+  }
+  
+  // Set up registration form event listener
+  const registrationForm = document.getElementById('registrationForm');
+  if (registrationForm) {
+    registrationForm.addEventListener('submit', handleRegistration);
+  }
+  
+  // Set up show login button
+  const showLoginBtn = document.getElementById('showLoginBtn');
+  if (showLoginBtn) {
+    showLoginBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      showLoginModal();
+    });
+  }
 });
 
 /**
@@ -20,11 +41,9 @@ function setupPasswordValidation() {
     registerConfirmPassword.addEventListener('input', () => {
       validatePasswordMatch(registerPassword, registerConfirmPassword);
     });
-      registerPassword.addEventListener('input', () => {
+    registerPassword.addEventListener('input', () => {
       validatePasswordMatch(registerPassword, registerConfirmPassword);
     });
-  } else {
-    // Password validation elements not found on this page
   }
 }
 
@@ -72,7 +91,6 @@ function handleRegistration(e) {
     showNotification('This email address is already registered. Please use a different email or log in.', 'error');
     return;
   }
-
   // Create new user object
   const newUser = {
     id: Date.now(),
@@ -83,12 +101,17 @@ function handleRegistration(e) {
     type: userType,
     createdAt: new Date().toISOString()
   };
-  // In a real app, we'd send this to a server
-  // For now, simulate adding to our local data
+
+  // Add to newly registered users in localStorage (separate from JSON users)
+  const newlyRegisteredUsers = DataManager.loadData('newlyRegisteredUsers', []);
+  newlyRegisteredUsers.push(newUser);
+  DataManager.saveData('newlyRegisteredUsers', newlyRegisteredUsers);
+  
+  // Also add to the current users array for immediate use
   users.push(newUser);
 
-  // Save data to storage
-  DataManager.saveData();
+  // Note: We don't call DataManager.saveData() for the main users array 
+  // since we want to keep JSON users separate from newly registered users
 
   // Get user data without password for localStorage
   const { password: _, ...userWithoutPassword } = newUser;
@@ -146,32 +169,33 @@ function validateRegistrationForm(fullName, email, phone, password, confirmPassw
     showNotification('You must agree to the Terms of Service and Privacy Policy', 'error');
     return false;
   }
-
   return true;
 }
 
 /**
- * Validate that passwords match in real-time
+ * Handle the login form submission (registration page specific)
  */
-function validatePasswordMatch() {
-  const password = document.getElementById('password');
-  const confirmPassword = document.getElementById('confirmPassword');
-  
-  if (password.value !== confirmPassword.value) {
-    confirmPassword.setCustomValidity("Passwords don't match");
-  } else {
-    confirmPassword.setCustomValidity('');
-  }
-}
-
-/**
- * Handle the login form submission
- */
-function handleLogin(e) {
+async function handleRegistrationPageLogin(e) {
   e.preventDefault();
   
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
+  
+  // Ensure data is loaded before attempting login
+  if (typeof users === 'undefined' || users.length === 0) {
+    try {
+      await loadData();
+    } catch (error) {
+      showNotification('Unable to load user data. Please refresh the page and try again.', 'error');
+      return;
+    }
+  }
+  
+  // Check if users array is still empty after loading
+  if (!users || users.length === 0) {
+    showNotification('No user accounts found. Please register first.', 'error');
+    return;
+  }
   
   // Find the user
   const user = users.find(u => u.email === email && u.password === password);

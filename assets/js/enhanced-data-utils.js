@@ -3,23 +3,19 @@
  * Centralized data operations for the Dinner Hosting Platform
  */
 
-class DataManager {
-  static saveData(key, data) {
+class DataManager {  static saveData(key, data) {
     try {
       localStorage.setItem(key, JSON.stringify(data));
       return true;
     } catch (error) {
-      console.error('Error saving data:', error);
       return false;
     }
   }
-
   static loadData(key, defaultValue = null) {
     try {
       const data = localStorage.getItem(key);
       return data ? JSON.parse(data) : defaultValue;
     } catch (error) {
-      console.error('Error loading data:', error);
       return defaultValue;
     }
   }
@@ -29,23 +25,29 @@ class DataManager {
     const updatedData = updateFunction(currentData);
     return this.saveData(key, updatedData);
   }
-
   static deleteData(key) {
     try {
       localStorage.removeItem(key);
       return true;
     } catch (error) {
-      console.error('Error deleting data:', error);
       return false;
     }
-  }
-
-  static clearAllData() {
+  }  static clearAllData() {
     try {
       localStorage.clear();
       return true;
     } catch (error) {
-      console.error('Error clearing data:', error);
+      return false;
+    }
+  }
+  static saveAllGlobalData() {
+    try {
+      // Save global arrays to localStorage
+      if (typeof dinners !== 'undefined') this.saveData('dinners', dinners);
+      if (typeof reservations !== 'undefined') this.saveData('reservations', reservations);
+      if (typeof users !== 'undefined') this.saveData('users', users);
+      return true;
+    } catch (error) {
       return false;
     }
   }

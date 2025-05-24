@@ -43,22 +43,25 @@ document.addEventListener('DOMContentLoaded', () => {
 async function init() {
   try {
     // Load data from JSON
-    await loadData(); // Ensures data is loaded
+    await loadData();
 
     // Check if user is logged in (from localStorage)
     checkUserLoginStatus();
 
     // Update UI based on user status
-    updateUIForUserStatus();    // Populate dinner listings and filters ONLY if on a page that needs them (e.g., index.html)
+    updateUIForUserStatus();
+
+    // Populate dinner listings and filters ONLY if on a page that needs them (e.g., index.html)
     // Check for a specific element unique to index.html's main content area
     if (document.getElementById('dinnerListingsContainer') || document.querySelector('.featured-dinners-section')) {
-      if (typeof displayDinners === 'function') displayDinners(dinners);
+      if (typeof displayDinners === 'function') {
+        displayDinners(dinners);
+      }
       if (typeof setupFilterListeners === 'function') setupFilterListeners();
       if (typeof updateFilterCounts === 'function') updateFilterCounts();
     }
 
   } catch (error) {
-    console.error('Initialization error:', error);
     if (typeof showNotification === 'function') {
         showNotification('Error loading application data. Please try again later.', 'error');
     }
@@ -74,26 +77,103 @@ async function loadData() {
   }
 
   dataLoadedPromise = (async () => {
-    try {
-      // Use DataManager to load data
-      const data = await DataManager.loadData(); 
-
-      dinners = data.dinners || [];
-      reservations = data.reservations || [];
-      users = data.users || [];
-
-      // Add default test user if no users exist
-      if (users.length === 0) {
-        users.push({
-          id: 1001, name: "Guest User", email: "guest@example.com",
-          phone: "555-123-4567", password: "password123", type: "guest",
-          createdAt: new Date().toISOString()
-        });
-        users.push({
-          id: 1002, name: "Host User", email: "host@example.com",
-          phone: "555-987-6543", password: "password123", type: "host",
-          createdAt: new Date().toISOString()        });
+    try {      // Initialize arrays
+      dinners = [];
+      reservations = DataManager.loadData('reservations', []);
+      users = [];
+        // Load initial data from dinners.json file
+      let jsonUsersLoaded = false;
+      try {
+        const response = await fetch('data/dinners.json');
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Load dinners from JSON
+          dinners = data.dinners || [];
+          
+          // Load users from JSON file as the initial user base
+          if (data.users && data.users.length > 0) {
+            users = [...data.users]; // Copy users from JSON
+            jsonUsersLoaded = true;
+          }
+        }
+      } catch (fetchError) {
+        // Fallback: Add some sample data if JSON can't be loaded (CORS issue with file://)
+        dinners = [
+          {
+            "id": "1",
+            "title": "Vegetarian Pasta Night",
+            "date": "2025-05-22",
+            "time": "18:00",
+            "description": "Delicious homemade pasta with a variety of vegetarian sauces and toppings. Bring your appetite!",
+            "price": 27,
+            "maxGuests": 6,
+            "image": "https://images.unsplash.com/photo-1556761223-4c4282c73f77",
+            "hostId": 2,
+            "hostName": "Tiffany Chen",
+            "isPublic": true,
+            "category": "vegetarian",
+            "createdAt": "2025-05-12T00:00:00.000Z"
+          },
+          {
+            "id": "2",
+            "title": "Breakfast for Dinner",
+            "date": "2025-05-23",
+            "time": "19:00",
+            "description": "Join us for a fun twist on dinner - we're serving up all your breakfast favorites! Pancakes, eggs, bacon, and more.",
+            "price": 22,
+            "maxGuests": 8,
+            "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b",
+            "hostId": 1,
+            "hostName": "Alex Johnson",
+            "isPublic": true,
+            "category": "american",
+            "createdAt": "2025-05-13T00:00:00.000Z"
+          },
+          {
+            "id": "3",
+            "title": "Italian Feast Night",
+            "date": "2025-05-24",
+            "time": "19:30",
+            "description": "Authentic Italian dishes prepared by a native chef. Traditional recipes passed down through generations.",
+            "price": 35,
+            "maxGuests": 10,
+            "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d",
+            "hostId": 3,
+            "hostName": "Marco Rossi",
+            "isPublic": true,
+            "category": "italian",
+            "createdAt": "2025-05-14T00:00:00.000Z"          }        ];
       }
+
+      // Load any newly created dinners from localStorage and merge them
+      const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
+      if (newlyCreatedDinners.length > 0) {
+        // Merge new dinners with existing dinners (avoid duplicates by ID)
+        newlyCreatedDinners.forEach(newDinner => {
+          const existingDinner = dinners.find(d => d.id === newDinner.id);
+          if (!existingDinner) {
+            dinners.push(newDinner);
+          }
+        });
+      }
+        // Save the combined dinners array to the main 'dinners' key for compatibility
+      DataManager.saveData('dinners', dinners);
+
+      // Load any newly registered users from localStorage and merge them
+      const newlyRegisteredUsers = DataManager.loadData('newlyRegisteredUsers', []);
+      if (newlyRegisteredUsers.length > 0) {
+        // Merge new users with existing users (avoid duplicates by email)
+        newlyRegisteredUsers.forEach(newUser => {
+          const existingUser = users.find(u => u.email === newUser.email);
+          if (!existingUser) {
+            users.push(newUser);
+          }
+        });
+      }
+      
+      // Save the combined users array to the main 'users' key for compatibility
+      DataManager.saveData('users', users);
 
       return true; // Indicate success
     } catch (error) {
@@ -265,11 +345,25 @@ function updateUIForUserStatus() {
 /**
  * Handle the login form submission
  */
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
-  
-  const email = document.getElementById('loginEmail').value;
+    const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
+  
+  // Ensure data is loaded before attempting login
+  if (typeof users === 'undefined' || users.length === 0) {
+    try {
+      await loadData();
+    } catch (error) {
+      showNotification('Unable to load user data. Please refresh the page and try again.', 'error');
+      return;
+    }
+  }
+    // Check if users array is still empty after loading
+  if (!users || users.length === 0) {
+    showNotification('No user accounts found. Please register first.', 'error');
+    return;
+  }
   
   // Find the user
   const user = users.find(u => u.email === email && u.password === password);
@@ -341,18 +435,23 @@ function handleRegister(e) {
   if (users.some(u => u.email === email)) {
     showNotification('This email is already registered', 'error');
     return;
-  }
-  // Create new user
+  }  // Create new user
   const newUser = {
     id: Date.now(),
     name,
     email,
     phone,
     password, // In a real app, this would be hashed
-    type: userType,    createdAt: new Date().toISOString()
+    type: userType,
+    createdAt: new Date().toISOString()
   };
   
-  // Add to users array
+  // Add to newly registered users in localStorage (separate from JSON users)
+  const newlyRegisteredUsers = DataManager.loadData('newlyRegisteredUsers', []);
+  newlyRegisteredUsers.push(newUser);
+  DataManager.saveData('newlyRegisteredUsers', newlyRegisteredUsers);
+  
+  // Also add to the current users array for immediate use
   users.push(newUser);
   
   // In a real app, we'd send this to a server
@@ -468,6 +567,7 @@ function handleHostDinnerClick() {
 function displayDinners(dinnersToShow, page = 1) {
   const container = document.getElementById('dinners-container');
   const paginationContainer = document.getElementById('dinners-pagination');
+  
   if (!container) return;
   
   // Pagination settings
@@ -913,16 +1013,16 @@ async function handleCreateDinner(e) {
       photographerName,
       photoUrl
     }
-  };
-  // Add to dinners array
+  };  // Add to dinners array
   dinners.push(newDinner);
   
+  // Save to the newly created dinners localStorage key for persistence across page reloads
+  const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
+  newlyCreatedDinners.push(newDinner);
+  DataManager.saveData('newlyCreatedDinners', newlyCreatedDinners);
+  
   // Save data to storage
-  await DataManager.saveData({
-    dinners,
-    reservations,
-    users
-  });
+  DataManager.saveAllGlobalData();
   
   // Close modal
   ModalManager.hide('createDinnerModal');
@@ -991,58 +1091,32 @@ function handleImageSearch() {
         </div>
       `;
       resultsContainer.appendChild(imageCol);
-    });
-      // Add click event to select images
-    ImageUtils.setupImageSelection('.dinner-image-option');
-  })  .catch(error => {
-    console.error('Error fetching images from proxy:', error);
-    
-    // Try to provide fallback demo images for development
-    const fallbackImages = [
-      {
-        urls: { small: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400' },
-        alt_description: 'Delicious food',
-        user: { name: 'Demo' },
-        links: { html: '#' }
-      },
-      {
-        urls: { small: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400' },
-        alt_description: 'Gourmet dish',
-        user: { name: 'Demo' },
-        links: { html: '#' }
-      },
-      {
-        urls: { small: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400' },
-        alt_description: 'Tasty meal',
-        user: { name: 'Demo' },
-        links: { html: '#' }
-      }
-    ];
-    
-    // Show fallback images with error message
-    resultsContainer.innerHTML = `      <div class="col-12 text-center py-2">
+    });    // Add click event to select images
+    ImageUtils.setupImageSelection('.dinner-image-option');  })  .catch(error => {
+    // Show error message if images can't be loaded
+    resultsContainer.innerHTML = `<div class="col-12 text-center py-2">
         <div class="alert alert-warning">
           <small><strong>Note:</strong> Unable to load images at the moment. Please try again later.</small>
         </div>
-      </div>
-    `;
-    
-    // Add fallback images
-    fallbackImages.forEach(item => {
-      const imageCol = document.createElement('div');
-      imageCol.className = 'col-4 mb-2';
-      imageCol.innerHTML = `
-        <div class="dinner-image-option" data-photographer="${item.user.name}" data-photo-url="${item.links.html}">
-          <img src="${item.urls.small}" alt="${item.alt_description || 'Food image'}" class="img-fluid rounded cursor-pointer">
-          <div class="photographer-credit small text-muted mt-1">Demo Image</div>
-        </div>
-      `;
-      resultsContainer.appendChild(imageCol);
-    });
-    
-    // Set up image selection for fallback images
-    ImageUtils.setupImageSelection('.dinner-image-option');
+      </div>`;
   });
+}
+
+// Filter dinners to show only upcoming ones (future dates)
+function getUpcomingDinners(dinners) {
+    if (!dinners || !Array.isArray(dinners)) {
+        return [];
+    }
+    
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Set to start of today for comparison
+    
+    return dinners.filter(dinner => {
+        if (!dinner.date) return false;
+        
+        const dinnerDate = new Date(dinner.date);
+        return dinnerDate >= now;
+    });
 }
 
 // ===== RESERVATION HANDLING =====
@@ -1182,12 +1256,8 @@ async function handleReservation(e) {
   };
     // Add to reservations array
   reservations.push(newReservation);
-    // Save data to storage to make sure it persists
-  await DataManager.saveData({
-    dinners,
-    reservations,
-    users
-  });
+  // Save data to storage to make sure it persists
+  DataManager.saveAllGlobalData();
   
   // Close modal
   ModalManager.hide('reserveDinnerModal');
@@ -1210,13 +1280,6 @@ async function handleReservation(e) {
 function formatDate(dateString) {
   const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
   return new Date(dateString).toLocaleDateString(undefined, options);
-}
-
-/**
- * Generate a random ID string
- */
-function generateId() {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
 // Note: Filter count functionality has been moved to handleHeroSearch.js

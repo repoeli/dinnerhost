@@ -470,12 +470,16 @@ async function handleCreateDinner(e) {
     imageAttribution: {
       photographerName,
       photoUrl
-    }  };
-  
-  // Add to dinners array
+    }  };    // Add to dinners array
   dinners.push(newDinner);
-    // Save data to storage
-  DataManager.saveData();
+  
+  // Save to the newly created dinners localStorage key for persistence across page reloads
+  const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
+  newlyCreatedDinners.push(newDinner);
+  DataManager.saveData('newlyCreatedDinners', newlyCreatedDinners);
+  
+  // Save data to storage
+  DataManager.saveAllGlobalData();
   
   // Close modal
   ModalManager.hide('createDinnerModal');
@@ -559,8 +563,7 @@ function handleEditDinner(e) {
     showNotification('Dinner not found for update', 'error');
     return;
   }
-  
-  // Update dinner object
+    // Update dinner object
   dinners[dinnerIndex] = {
     ...dinners[dinnerIndex],
     title,
@@ -568,17 +571,27 @@ function handleEditDinner(e) {
     time,
     description,
     price,
-    maxGuests,    image,
+    maxGuests,
+    image,
     isPublic,
     category,
     updatedAt: new Date().toISOString(),
     imageAttribution: {
       photographerName,
-      photoUrl    }
+      photoUrl
+    }
   };
   
+  // Update the dinner in newlyCreatedDinners localStorage if it exists there
+  const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
+  const newlyCreatedIndex = newlyCreatedDinners.findIndex(d => d.id.toString() === dinnerId.toString());
+  if (newlyCreatedIndex !== -1) {
+    newlyCreatedDinners[newlyCreatedIndex] = dinners[dinnerIndex];
+    DataManager.saveData('newlyCreatedDinners', newlyCreatedDinners);
+  }
+  
   // Save data to storage
-  DataManager.saveData();
+  DataManager.saveAllGlobalData();
   
   // Close modal
   ModalManager.hide('editDinnerModal');
@@ -620,16 +633,23 @@ function handleDeleteDinner() {
     showNotification('Dinner not found for deletion', 'error');
     return;
   }
-  
-  // Remove dinner
+    // Remove dinner
   dinners.splice(dinnerIndex, 1);
-    // Also remove associated reservations
+  
+  // Also remove from newlyCreatedDinners localStorage if it exists there
+  const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
+  const updatedNewlyCreatedDinners = newlyCreatedDinners.filter(d => d.id.toString() !== dinnerId.toString());
+  if (updatedNewlyCreatedDinners.length !== newlyCreatedDinners.length) {
+    DataManager.saveData('newlyCreatedDinners', updatedNewlyCreatedDinners);
+  }
+  
+  // Also remove associated reservations
   const updatedReservations = reservations.filter(r => r.dinnerId !== dinnerId);
   reservations.length = 0;
   reservations.push(...updatedReservations);
   
   // Save data to storage
-  DataManager.saveData();
+  DataManager.saveAllGlobalData();
   
   // Close modal
   ModalManager.hide('deleteConfirmModal');
@@ -801,57 +821,14 @@ function handleImageSearch(isEdit = false) {
       
       // Add click event to select images
       ImageUtils.setupImageSelectionForContainer(resultsContainerId);
-    })
-    .catch(error => {
-    console.error('Error fetching images from proxy:', error);
+    })    .catch(error => {    const resultsContainer = document.getElementById(resultsContainerId);
     
-    const resultsContainer = document.getElementById(resultsContainerId);
-    
-    // Try to provide fallback demo images for development
-    const fallbackImages = [
-      {
-        urls: { small: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400' },
-        alt_description: 'Delicious food',
-        user: { name: 'Demo' },
-        links: { html: '#' }
-      },
-      {
-        urls: { small: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400' },
-        alt_description: 'Gourmet dish',
-        user: { name: 'Demo' },
-        links: { html: '#' }
-      },
-      {
-        urls: { small: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400' },
-        alt_description: 'Tasty meal',
-        user: { name: 'Demo' },
-        links: { html: '#' }
-      }
-    ];
-    
-    // Show fallback images with error message
-    resultsContainer.innerHTML = `      <div class="col-12 text-center py-2">
+    // Show error message if images can't be loaded
+    resultsContainer.innerHTML = `<div class="col-12 text-center py-2">
         <div class="alert alert-warning">
           <small><strong>Note:</strong> Unable to load images at the moment. Please try again later.</small>
         </div>
-      </div>
-    `;
-    
-    // Add fallback images
-    fallbackImages.forEach(item => {
-      const imageCol = document.createElement('div');
-      imageCol.className = 'col-4 mb-2';
-      imageCol.innerHTML = `
-        <div class="dinner-image-option" data-photographer="${item.user.name}" data-photo-url="${item.links.html}">
-          <img src="${item.urls.small}" alt="${item.alt_description || 'Food image'}" class="img-fluid rounded cursor-pointer">
-          <div class="photographer-credit small text-muted mt-1">Demo Image</div>
-        </div>
-      `;
-      resultsContainer.appendChild(imageCol);
-    });
-    
-    // Set up image selection for fallback images
-    ImageUtils.setupImageSelectionForContainer(resultsContainerId);
+      </div>`;
   });
 }
 

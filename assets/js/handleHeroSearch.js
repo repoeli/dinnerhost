@@ -5,10 +5,40 @@
  */
 function handleHeroSearch() {
   const searchInput = document.getElementById('heroSearch');
-  if (!searchInput) return;
+  if (!searchInput) {
+    return;
+  }
   
-  const searchTerm = searchInput.value.trim().toLowerCase();
-    // Don't proceed if search term is empty - just show all dinners
+  const searchTerm = searchInput.value.trim().toLowerCase();  // Check if dinners array is available
+  if (typeof dinners === 'undefined') {
+    if (typeof showNotification === 'function') {
+      showNotification('Search data not loaded yet. Please wait a moment and try again.', 'error');
+    }
+    return;
+  }
+  
+  if (!Array.isArray(dinners)) {
+    if (typeof showNotification === 'function') {
+      showNotification('Search data is invalid. Please refresh the page.', 'error');
+    }
+    return;
+  }
+  
+  // Check if required functions are available
+  if (typeof displayDinners !== 'function') {
+    if (typeof showNotification === 'function') {
+      showNotification('Search functionality not ready. Please refresh the page.', 'error');
+    }
+    return;
+  }
+  
+  if (typeof getUpcomingDinners !== 'function') {
+    if (typeof showNotification === 'function') {
+      showNotification('Search functionality not ready. Please refresh the page.', 'error');
+    }
+    return;
+  }
+  // Don't proceed if search term is empty - just show all dinners
   if (searchTerm === '') {
     // Show all upcoming dinners (page 1)
     displayDinners(getUpcomingDinners(dinners), 1);
@@ -36,8 +66,7 @@ function handleHeroSearch() {
     searchBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Searching...';
     searchBtn.disabled = true;
   }
-    
-  // Apply highlight effect to the featured dinners section
+      // Apply highlight effect to the featured dinners section
   const featuredSection = document.getElementById('featured-dinners');
   if (featuredSection) {
     // Show loading state
@@ -45,68 +74,88 @@ function handleHeroSearch() {
     
     // Apply highlight effect to the featured dinners section
     featuredSection.classList.add('highlight-section');
-  }    // Filter dinners based on search term (from upcoming dinners only)
-  const upcomingDinners = getUpcomingDinners(dinners);
-  const filteredDinners = upcomingDinners.filter(dinner => {
-    return (
-      dinner.title?.toLowerCase().includes(searchTerm) ||
-      dinner.description?.toLowerCase().includes(searchTerm) ||
-      dinner.cuisineType?.toLowerCase().includes(searchTerm) ||
-      dinner.location?.toLowerCase().includes(searchTerm) ||
-      dinner.hostName?.toLowerCase().includes(searchTerm) ||
-      dinner.category?.toLowerCase().includes(searchTerm) ||
-      (dinner.date && dinner.date.includes(searchTerm))
-    );
-  });
-        // Set a small timeout to allow the loading effect to be noticeable  
-  setTimeout(() => {
-    // Display filtered dinners (reset to page 1)
-    displayDinners(filteredDinners, 1);
-    
-    // Update search results heading
-    updateSearchResultsHeading(searchTerm, filteredDinners.length);
-    
-    // Clear any active filter buttons
-    document.querySelectorAll('[id^="filter-"]').forEach(btn => {
-      btn.classList.remove('active');
-    });
-    
-    // Add active class to "All" filter button to indicate a custom filter is applied
-    const allFilterBtn = document.querySelector('#filter-all');    if (allFilterBtn) {
-      allFilterBtn.classList.add('active');
-    }
+  }
+  
+  try {
+    // Filter dinners based on search term (from upcoming dinners only)
+    const upcomingDinners = getUpcomingDinners(dinners);
+    const filteredDinners = upcomingDinners.filter(dinner => {
+      return (
+        dinner.title?.toLowerCase().includes(searchTerm) ||
+        dinner.description?.toLowerCase().includes(searchTerm) ||
+        dinner.cuisineType?.toLowerCase().includes(searchTerm) ||
+        dinner.location?.toLowerCase().includes(searchTerm) ||
+        dinner.hostName?.toLowerCase().includes(searchTerm) ||
+        dinner.category?.toLowerCase().includes(searchTerm) ||
+        (dinner.date && dinner.date.includes(searchTerm))
+      );
+    });    // Set a small timeout to allow the loading effect to be noticeable  
+    setTimeout(() => {
+      // Display filtered dinners (reset to page 1)
+      displayDinners(filteredDinners, 1);
+      
+      // Update search results heading
+      updateSearchResultsHeading(searchTerm, filteredDinners.length);
+      
+      // Clear any active filter buttons
+      document.querySelectorAll('[id^="filter-"]').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Add active class to "All" filter button to indicate a custom filter is applied
+      const allFilterBtn = document.querySelector('#filter-all');
+      if (allFilterBtn) {
+        allFilterBtn.classList.add('active');
+      }
+      
       // Update filter button badges - use unified function from script.js if available
-    if (typeof updateFilterCounts === 'function') {
-      updateFilterCounts(filteredDinners);
-    } else {
-      // Fallback: update filter counts manually if function not available
-      updateSearchFilterCounts(filteredDinners);
-    }
-    
-    // Reset search button
+      if (typeof updateFilterCounts === 'function') {
+        updateFilterCounts(filteredDinners);
+      } else {
+        // Fallback: update filter counts manually if function not available
+        updateSearchFilterCounts(filteredDinners);
+      }
+      
+      // Reset search button
+      if (searchBtn) {
+        searchBtn.innerHTML = '<i class="bi bi-search me-1"></i>Find Dinners';
+        searchBtn.disabled = false;
+      }
+      
+      // Remove loading state
+      if (featuredSection) {
+        featuredSection.classList.remove('section-loading');
+      }
+      
+      // Show notification based on results
+      if (filteredDinners.length === 0) {
+        showNotification(`No dinners found matching "${searchTerm}". Try a different search term.`, 'info');
+      } else {
+        showNotification(`Found ${filteredDinners.length} dinners matching "${searchTerm}"`, 'success');
+      }
+      
+      // Remove highlight effect after animation completes
+      setTimeout(() => {
+        if (featuredSection) {
+          featuredSection.classList.remove('highlight-section');
+        }
+      }, 1500);
+    }, 600);
+      } catch (error) {
+    // Reset search button and loading state in case of error
     if (searchBtn) {
       searchBtn.innerHTML = '<i class="bi bi-search me-1"></i>Find Dinners';
       searchBtn.disabled = false;
     }
     
-    // Remove loading state
     if (featuredSection) {
       featuredSection.classList.remove('section-loading');
+      featuredSection.classList.remove('highlight-section');
     }
     
-    // Show notification based on results
-    if (filteredDinners.length === 0) {
-      showNotification(`No dinners found matching "${searchTerm}". Try a different search term.`, 'info');
-    } else {
-      showNotification(`Found ${filteredDinners.length} dinners matching "${searchTerm}"`, 'success');
-    }    
-    // Remove highlight effect after animation completes
-    setTimeout(() => {
-      if (featuredSection) {
-        featuredSection.classList.remove('highlight-section');
-      }
-    }, 1500);
-      }, 600);
+    // Show error notification
+    showNotification('Search encountered an error. Please try again.', 'danger');
+  }
 }
 
 /**
@@ -267,6 +316,28 @@ function resetSectionHeader() {
  * Initialize search functionality when the page loads
  */
 document.addEventListener('DOMContentLoaded', () => {
+  // Wait for dependencies to load before setting up search
+  const initSearchWithDelay = () => {
+    // Check if main dependencies are available
+    if (typeof dinners !== 'undefined' && 
+        typeof displayDinners === 'function' && 
+        typeof getUpcomingDinners === 'function') {
+      
+      setupSearchFunctionality();
+      
+    } else {
+      setTimeout(initSearchWithDelay, 500);
+    }
+  };
+  
+  // Start checking for dependencies
+  initSearchWithDelay();
+});
+
+/**
+ * Set up search functionality once dependencies are ready
+ */
+function setupSearchFunctionality() {
   // Initialize recent searches UI
   updateRecentSearchesUI();
   
@@ -292,6 +363,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Set up search button click event
   const searchBtn = document.getElementById('heroSearchBtn');
   if (searchBtn) {
-    searchBtn.addEventListener('click', handleHeroSearch);
+    searchBtn.addEventListener('click', (e) => {
+      e.preventDefault(); // Prevent any default form submission
+      handleHeroSearch();
+    });
   }
-});
+}
