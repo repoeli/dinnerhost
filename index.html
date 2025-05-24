@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Connect with passionate local chefs, enjoy delicious home-cooked meals, and build new friendships in your community with our dinner hosting platform." />
+  <title>Hosting Your Dinner - Connect with Local Chefs for Home-Cooked Meals</title>
+  <!-- Bootstrap CSS -->  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    crossorigin="anonymous"
+  />  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/navbar.css" />
+</head>
+<body>  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top bg-white shadow">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <span class="brand-icon me-2">🍴</span>
+        <span class="brand-text fw-bold text-gradient">Hosting Your Dinner</span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" 
+        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item">
+            <a class="nav-link active nav-link-hover px-3 mx-1" aria-current="page" href="#">
+              <i class="bi bi-house-heart-fill me-1"></i>Home
+            </a>
+          </li>
+          <li class="nav-item auth-dependent host-only">
+            <a class="nav-link nav-link-hover px-3 mx-1" href="host-dashboard.html">
+              <i class="bi bi-calendar2-event-fill me-1"></i>My Dinners
+            </a>
+          </li>
+          <li class="nav-item auth-dependent guest-only">
+            <a class="nav-link nav-link-hover px-3 mx-1" href="guest-dashboard.html">
+              <i class="bi bi-bookmark-heart-fill me-1"></i>My Reservations
+            </a>
+          </li>
+          <li class="nav-item mx-2">
+            <button class="btn btn-warning rounded-pill btn-glow host-only auth-dependent" id="hostDinnerBtn">
+              <i class="bi bi-plus-circle-fill me-1"></i>Host Dinner
+            </button>
+            <button class="btn btn-outline-warning btn-hover-glow rounded-pill guest-only auth-dependent d-none" id="loginBtn">
+              <i class="bi bi-box-arrow-in-right me-1"></i>Login
+            </button>
+          </li>
+          <li class="nav-item auth-dependent">
+            <div class="dropdown">
+              <button class="btn btn-light btn-user dropdown-toggle d-flex align-items-center shadow-sm" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle me-2 text-primary-custom"></i>
+                <span class="user-name">User</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item dropdown-item-hover" href="#"><i class="bi bi-person-badge me-2"></i>Profile</a></li>
+                <li><a class="dropdown-item dropdown-item-hover host-only" href="host-dashboard.html"><i class="bi bi-speedometer2 me-2"></i>Host Dashboard</a></li>
+                <li><a class="dropdown-item dropdown-item-hover guest-only" href="guest-dashboard.html"><i class="bi bi-bookmark-heart me-2"></i>My Reservations</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><button class="dropdown-item dropdown-item-hover" id="logoutBtn"><i class="bi bi-box-arrow-right me-2"></i>Logout</button></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Hero Section -->  
+  <section class="hero text-white">
+    <div >
+     
+    <div class="hero-background"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-bottom-fade"></div>
+    <div class="steam-wrapper">
+      <div class="steam"></div>
+      <div class="steam"></div>
+      <div class="steam"></div>
+    </div>
+    <div class="hero-particles">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+    </div>    
+    <div class="container h-100 d-flex align-items-center justify-content-center">
+      <div class="hero-content-wrapper">
+        <div class="hero-content text-center">
+          <h1 class="display-4 fw-bold mb-3">Home Cooked Meals</h1>
+          <div class="hero-accent-line">
+            <div class="accent-dot accent-dot-left"></div>
+            <div class="accent-dot accent-dot-right"></div>
+          </div>
+          <p class="lead mb-4">Enjoy delicious meals, and build new friendships in your community.</p>
+          
+          <div class="hero-cta-buttons mt-4">
+            <button class="btn btn-warning btn-lg" id="exploreDinnersBtn">
+              <i class="bi bi-search me-1"></i>Explore Dinners
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+      <div class="hero-accent-line hero-accent-line-animated"></div>
+      <div class="hero-accent-line hero-accent-line-animated"></div>
+      <div class="hero-accent-line hero-accent-line-animated"></div>
+      <div class="hero-accent-line hero-accent-line-animated"></div>
+      <div class="hero-accent-line hero-accent-line-animated"></div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="stats-box mb-4 mb-md-0">
+            <span class="stats-number">300+</span>
+            <span class="stats-label text-uppercase fw-bold text-secondary">Hosts</span>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stats-box mb-4 mb-md-0">
+            <span class="stats-number">1200+</span>
+            <span class="stats-label text-uppercase fw-bold text-secondary">Dinners</span>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stats-box">
+            <span class="stats-number">5000+</span>
+            <span class="stats-label text-uppercase fw-bold text-secondary">Connections</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dinners Section -->
+  <main class="container pt-4" id="mainContent">
+    <section id="featured-dinners" class="featured-dinners-section py-4">      <div class="section-header mb-4">
+        <h2 class="display-6 fw-bold mb-0 border-start border-4 border-warning ps-3">Featured Dinners</h2>
+        <p class="text-muted mt-2">Discover unique dining experiences in your community</p>
+      </div>
+      
+      <!-- Search Box -->
+      <div class="dinner-search-container mb-4">
+        <div class="row g-2">
+          <div class="col-md-9">
+            <div class="search-input-wrapper">
+              <i class="bi bi-geo-alt search-icon"></i>
+              <input type="text" class="form-control shadow-sm" placeholder="Search by cuisine, location, or date..." id="heroSearch">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-warning w-100 shadow-sm" id="heroSearchBtn">
+              <i class="bi bi-search me-1"></i>Find Dinners
+            </button>
+          </div>
+        </div>
+        
+        <!-- Recent Searches -->
+        <div id="recentSearches" class="recent-searches-container mt-2">
+          <div class="d-flex align-items-center mb-1">
+            <small class="text-muted"><i class="bi bi-clock-history me-1"></i> Recent Searches</small>
+          </div>
+          <div class="recent-searches-list d-flex flex-wrap"></div>
+        </div>
+      </div>
+      
+      <!-- Filters -->
+      <div class="filter-container mb-4">
+        <div class="d-flex align-items-center flex-wrap">
+          <div class="me-3 mb-2 mb-md-0">
+            <i class="bi bi-funnel me-2"></i>
+            <strong>Filter Dinners</strong>
+            <span class="text-muted ms-2">Showing: </span>
+          </div>
+          <div class="d-flex flex-wrap">
+            <button id="filter-all" class="btn btn-sm btn-outline-secondary rounded-pill active me-2 mb-2" data-filter="all">
+              <i class="bi bi-check-circle-fill me-1"></i> All <span class="badge bg-secondary">3</span>
+            </button>
+            <button id="filter-today" class="btn btn-sm btn-outline-secondary rounded-pill me-2 mb-2" data-filter="today">
+              <i class="bi bi-calendar-event me-1"></i> Today <span class="badge bg-secondary">1</span>
+            </button>
+            <button id="filter-this-week" class="btn btn-sm btn-outline-secondary rounded-pill me-2 mb-2" data-filter="this-week">
+              <i class="bi bi-calendar-week me-1"></i> This Week <span class="badge bg-secondary">8</span>
+            </button>
+            <button id="filter-vegetarian" class="btn btn-sm btn-outline-secondary rounded-pill me-2 mb-2" data-filter="vegetarian">
+              <i class="bi bi-leaf-fill me-1"></i> Vegetarian <span class="badge bg-secondary">1</span>
+            </button>
+            <button id="filter-under-20" class="btn btn-sm btn-outline-secondary rounded-pill me-2 mb-2" data-filter="under-20">
+              <i class="bi bi-currency-dollar me-1"></i> Under $20 <span class="badge bg-secondary">2</span>
+            </button>
+          </div>
+        </div>
+      </div>
+        <!-- Dinner Cards -->
+      <div class="row" id="dinners-container">
+        <!-- Dinner cards will be loaded from JavaScript -->
+      </div>
+      
+      <!-- Pagination -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <nav aria-label="Dinner pagination">
+            <ul class="pagination justify-content-center" id="dinners-pagination">
+              <!-- Pagination will be generated by JavaScript -->
+            </ul>
+          </nav>
+        </div>
+      </div>
+      
+      <div class="text-center mt-4">
+        <button class="btn btn-lg btn-outline-warning px-4">
+          <i class="bi bi-grid-3x3-gap-fill me-2"></i>View All Dinners
+        </button>
+      </div>
+    </section></main>
+
+  <!-- Authentication Modal -->
+  <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Login or Register</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Please login or create an account to continue.</p>
+          <div class="d-flex justify-content-between mt-3">
+            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal">
+              Login
+            </button>
+            <button type="button" class="btn btn-warning" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#registerModal">
+              Create Account
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Login to Your Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="loginEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPassword" required>
+              <div class="form-text text-end">
+                <a href="#" class="text-warning">Forgot password?</a>
+              </div>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-warning">Log In</button>
+            </div>
+            <div class="text-center mt-3">
+              <small>Don't have an account? <a href="#" class="text-warning" id="showRegisterFromLogin">Sign Up</a></small>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reserve Dinner Modal -->
+  <div class="modal fade" id="reserveDinnerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reserve Your Spot</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <h4 id="reservationDinnerTitle" class="mb-2"></h4>
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-person-circle me-2"></i>
+            <span id="reservationHostName"></span>
+          </div>
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-calendar-event me-2"></i>
+            <span id="reservationDateTime"></span>
+          </div>
+          <div class="d-flex align-items-center mb-4">
+            <i class="bi bi-people-fill me-2"></i>
+            <span id="reservationSpots"></span>
+          </div>
+          
+          <form id="reservationForm">
+            <input type="hidden" id="reservationDinnerId" value="">
+            
+            <div class="mb-3">
+              <label for="guestName" class="form-label">Your Name</label>
+              <input type="text" class="form-control" id="guestName" required>
+            </div>
+            <div class="mb-3">
+              <label for="guestEmail" class="form-label">Email Address</label>
+              <input type="email" class="form-control" id="guestEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="guestPhone" class="form-label">Phone Number (Optional)</label>
+              <input type="tel" class="form-control" id="guestPhone">
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Number of Guests</label>
+              <div class="d-flex align-items-center">
+                <button type="button" class="btn btn-outline-secondary" id="guestsDecrease">−</button>
+                <input type="text" class="form-control text-center mx-2" id="guestsCount" value="1" readonly>
+                <button type="button" class="btn btn-outline-secondary" id="guestsIncrease">+</button>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Dietary Preferences (Optional)</label>
+              <div class="d-flex flex-wrap gap-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="vegetarian" id="prefVegetarian">
+                  <label class="form-check-label" for="prefVegetarian">Vegetarian</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="vegan" id="prefVegan">
+                  <label class="form-check-label" for="prefVegan">Vegan</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="gluten-free" id="prefGlutenFree">
+                  <label class="form-check-label" for="prefGlutenFree">Gluten-Free</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="dairy-free" id="prefDairyFree">
+                  <label class="form-check-label" for="prefDairyFree">Dairy-Free</label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="specialRequests" class="form-label">Special Requests</label>
+              <textarea class="form-control" id="specialRequests" rows="2"></textarea>
+            </div>
+            
+            <div class="price-summary p-3 bg-light rounded mb-3">
+              <div class="d-flex justify-content-between mb-2">
+                <span>Price per person:</span>
+                <span id="perPersonPrice">$0.00</span>
+              </div>
+              <div class="d-flex justify-content-between fw-bold">
+                <span>Total:</span>
+                <span id="totalPrice">$0.00</span>
+              </div>
+            </div>
+            
+            <div class="d-grid">
+              <button type="submit" class="btn btn-warning">Complete Reservation</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Registration Modal -->
+  <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create Your Account</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="registerForm">
+            <div class="mb-4">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="userType" id="registerTypeGuest" value="guest" checked>
+                <label class="form-check-label" for="registerTypeGuest">
+                  <i class="bi bi-person-circle me-1"></i>
+                  I want to join dinners as a guest
+                </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="userType" id="registerTypeHost" value="host">
+                <label class="form-check-label" for="registerTypeHost">
+                  <i class="bi bi-house-door me-1"></i>
+                  I want to host my own dinners
+                </label>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="registerName" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="registerName" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerEmail" class="form-label">Email Address</label>
+              <input type="email" class="form-control" id="registerEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPhone" class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="registerPhone" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="registerPassword" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerConfirmPassword" class="form-label">Confirm Password</label>
+              <input type="password" class="form-control" id="registerConfirmPassword" required>
+            </div>
+            
+            <div class="form-check mb-4">
+              <input class="form-check-input" type="checkbox" id="registerTerms" required>
+              <label class="form-check-label" for="registerTerms">
+                I agree to the <a href="#" class="text-warning">Terms of Service</a> and <a href="#" class="text-warning">Privacy Policy</a>
+              </label>
+            </div>
+            
+            <div class="d-grid">
+              <button type="submit" class="btn btn-warning">Create Account</button>
+            </div>
+            
+            <div class="text-center mt-3">
+              <small>Already have an account? <a href="#" class="text-warning" id="showLoginFromRegister">Log In</a></small>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>  </div>
+
+  <!-- Create Dinner Modal -->
+  <div class="modal fade" id="createDinnerModal" tabindex="-1" aria-labelledby="createDinnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createDinnerModalLabel">Create New Dinner</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="createDinnerForm">
+            <div class="mb-3">
+              <label for="dinnerTitle" class="form-label">Title</label>
+              <input type="text" class="form-control" id="dinnerTitle" placeholder="Pizza & Jazz" required>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label for="dinnerDate" class="form-label">Date [&] Time</label>
+                <input type="datetime-local" class="form-control" id="dinnerDate" required>
+              </div>
+              <div class="col-md-4">
+                <label for="dinnerPrice" class="form-label">Price ($)</label>
+                <input type="number" class="form-control" id="dinnerPrice" min="0" step="0.01" required>
+              </div>
+              <div class="col-md-4">
+                <label for="dinnerMaxGuests" class="form-label">Max Guests</label>
+                <input type="number" class="form-control" id="dinnerMaxGuests" min="1" step="1" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="dinnerDescription" class="form-label">Description</label>
+              <textarea class="form-control" id="dinnerDescription" rows="3" placeholder="Enter description"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Menu Image</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="dinnerImageSearch" placeholder="Search for images or select from the examples below">
+                <button class="btn btn-outline-secondary" type="button" id="searchImagesBtn">Search</button>
+              </div>
+              <div class="mt-2">
+                <div class="row" id="imageResults">
+                  <!-- Images will be loaded here -->
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="dinnerPublic" checked>
+                <label class="form-check-label" for="dinnerPublic">
+                  Show to public (anyone can see and join)
+                </label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="dinnerCategory" class="form-label">Dinner Category</label>
+              <select class="form-select" id="dinnerCategory" required>
+                <option value="casual">Casual</option>
+                <option value="gourmet">Gourmet</option>
+                <option value="vegan">Vegan</option>
+                <option value="ethnic">Ethnic</option>
+                <option value="theme">Theme Night</option>
+              </select>
+            </div>
+            <div class="text-end">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-warning">Create Dinner</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap JS Bundle (Popper included) -->  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"
+  ></script>  <!-- API Configuration -->  
+  <script src="assets/js/api-config.js"></script>  <!-- Enhanced Utilities -->
+  <script src="assets/js/modal-utils.js"></script>
+  <script src="assets/js/enhanced-data-utils.js"></script>
+  <!-- App JavaScript -->
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/handleHeroSearch.js"></script>
+  <script src="assets/js/fireAnimation.js"></script>
+  <script src="assets/js/registration.js"></script>
+</body>
+</html>

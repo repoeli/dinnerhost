@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guest Dashboard | Hosting Your Dinner</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-..."
+    crossorigin="anonymous"
+  />  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/navbar.css" />
+</head>
+<body>  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top bg-white shadow">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+        <span class="brand-icon me-2">🍴</span>
+        <span class="brand-text fw-bold text-gradient">Hosting Your Dinner</span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" 
+        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item">
+            <a class="nav-link nav-link-hover px-3 mx-1" href="index.html">
+              <i class="bi bi-house-heart-fill me-1"></i>Home
+            </a>
+          </li>          <li class="nav-item">
+            <a class="nav-link active nav-link-hover px-3 mx-1" aria-current="page" href="#">
+              <i class="bi bi-bookmark-heart-fill me-1"></i>My Reservations
+            </a>
+          </li>
+          <li class="nav-item">
+            <div class="dropdown">
+              <button class="btn btn-light btn-user dropdown-toggle d-flex align-items-center shadow-sm" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle me-2 text-primary-custom"></i>
+                <span class="user-name" id="navUsername">User</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item dropdown-item-hover" href="#"><i class="bi bi-person-badge me-2"></i>Profile</a></li>
+                <li><a class="dropdown-item dropdown-item-hover" href="guest-dashboard.html"><i class="bi bi-bookmark-heart me-2"></i>My Reservations</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><button class="dropdown-item dropdown-item-hover" id="logoutBtn"><i class="bi bi-box-arrow-right me-2"></i>Logout</button></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1>My Reservations</h1>
+        <p class="text-muted">Welcome back, <span id="guestName" class="fw-bold">Guest</span>!</p>
+      </div>
+      <a href="index.html#featured-dinners" class="btn btn-warning">
+        <i class="bi bi-search me-2"></i>Find Dinners
+      </a>
+    </div>
+    
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="reservationTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true">
+          Upcoming <span class="badge bg-warning text-dark ms-1" id="upcomingCount">0</span>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab" aria-controls="past" aria-selected="false">
+          Past <span class="badge bg-secondary ms-1" id="pastCount">0</span>
+        </button>
+      </li>
+    </ul>
+    
+    <div class="tab-content" id="reservationsTabContent">
+      <!-- Upcoming Reservations Tab -->
+      <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+        <div class="row" id="upcomingReservations">
+          <!-- Upcoming reservations will be loaded here -->
+        </div>
+      </div>
+      
+      <!-- Past Reservations Tab -->
+      <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+        <div class="row" id="pastReservations">
+          <!-- Past reservations will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Cancel Reservation Modal -->
+  <div class="modal fade" id="cancelReservationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Cancel Reservation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to cancel your reservation for "<span id="cancelDinnerTitle"></span>"?</p>
+          <input type="hidden" id="cancelReservationId" value="">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Reservation</button>
+          <button type="button" class="btn btn-danger" id="confirmCancelBtn">Cancel Reservation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modify Reservation Modal -->
+  <div class="modal fade" id="modifyReservationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modify Reservation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <h5 id="modifyDinnerTitle" class="mb-3"></h5>
+          
+          <form id="modifyReservationForm">
+            <input type="hidden" id="modifyReservationId" value="">
+            <input type="hidden" id="modifyDinnerId" value="">
+            
+            <div class="mb-3">
+              <label class="form-label">Number of Guests</label>
+              <div class="d-flex align-items-center">
+                <button type="button" class="btn btn-outline-secondary" id="modifyGuestsDecrease">−</button>
+                <input type="text" class="form-control text-center mx-2" id="modifyGuestsCount" value="1" readonly>
+                <button type="button" class="btn btn-outline-secondary" id="modifyGuestsIncrease">+</button>
+              </div>
+              <div class="form-text" id="modifyAvailableSpots">Available spots: 0</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Dietary Preferences (Optional)</label>
+              <div class="d-flex flex-wrap gap-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="vegetarian" id="modifyPrefVegetarian">
+                  <label class="form-check-label" for="modifyPrefVegetarian">Vegetarian</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="vegan" id="modifyPrefVegan">
+                  <label class="form-check-label" for="modifyPrefVegan">Vegan</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="gluten-free" id="modifyPrefGlutenFree">
+                  <label class="form-check-label" for="modifyPrefGlutenFree">Gluten-Free</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="dairy-free" id="modifyPrefDairyFree">
+                  <label class="form-check-label" for="modifyPrefDairyFree">Dairy-Free</label>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="modifySpecialRequests" class="form-label">Special Requests</label>
+              <textarea class="form-control" id="modifySpecialRequests" rows="2"></textarea>
+            </div>
+            
+            <div class="price-summary p-3 bg-light rounded mb-3">
+              <div class="d-flex justify-content-between mb-2">
+                <span>Price per person:</span>
+                <span id="modifyPerPersonPrice">$0.00</span>
+              </div>
+              <div class="d-flex justify-content-between fw-bold">
+                <span>Total:</span>
+                <span id="modifyTotalPrice">$0.00</span>
+              </div>
+            </div>
+            
+            <div class="d-grid">
+              <button type="submit" class="btn btn-warning">Update Reservation</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle (Popper included) -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-..."
+    crossorigin="anonymous"  ></script>  <!-- App JavaScript -->
+  <script src="assets/js/api-config.js"></script>
+  <!-- Enhanced Utilities -->  <script src="assets/js/modal-utils.js"></script>
+  <script src="assets/js/enhanced-data-utils.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/guest-dashboard.js"></script>
+</body>
+</html>
