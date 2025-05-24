@@ -411,10 +411,8 @@ function setupGuestDashboardEvents() {
  */
 function confirmCancelReservation(reservationId) {
   // Find reservation
-  const reservation = reservations.find(r => r.id.toString() === reservationId);
-  if (!reservation) {
+  const reservation = reservations.find(r => r.id.toString() === reservationId);  if (!reservation) {
     showNotification('Reservation not found', 'error');
-    console.error('Reservation not found with ID:', reservationId, 'Available reservations:', reservations);
     return;
   }
   
@@ -439,12 +437,10 @@ function confirmCancelReservation(reservationId) {
  */
 async function handleCancelReservation() {
   const reservationId = document.getElementById('cancelReservationId').value;
-  
-  // Find and remove reservation
+    // Find and remove reservation
   const reservationIndex = reservations.findIndex(r => r.id.toString() === reservationId.toString());
   if (reservationIndex === -1) {
     showNotification('Reservation not found for cancellation', 'error');
-    console.error('Reservation not found with ID:', reservationId, 'Available reservations:', reservations);
     return;
   }
     // Remove reservation
@@ -471,12 +467,10 @@ async function handleCancelReservation() {
  * Populates the form with existing reservation data and shows the modal
  * @param {string} reservationId - The ID of the reservation to modify
  */
-function modifyReservation(reservationId) {
-  // Find reservation
+function modifyReservation(reservationId) {  // Find reservation
   const reservation = reservations.find(r => r.id.toString() === reservationId.toString());
   if (!reservation) {
     showNotification('Reservation not found for modification', 'error');
-    console.error('Reservation not found with ID:', reservationId, 'Available reservations:', reservations);
     return;
   }
   
@@ -574,12 +568,10 @@ async function handleModifyReservation(e) {
   if (document.getElementById('modifyPrefVegan').checked) preferences.push('vegan');
   if (document.getElementById('modifyPrefGlutenFree').checked) preferences.push('gluten-free');
   if (document.getElementById('modifyPrefDairyFree').checked) preferences.push('dairy-free');
-  
-  // Find reservation
+    // Find reservation
   const reservationIndex = reservations.findIndex(r => r.id.toString() === reservationId.toString());
   if (reservationIndex === -1) {
     showNotification('Reservation not found for update', 'error');
-    console.error('Reservation not found with ID:', reservationId, 'Available reservations:', reservations);
     return;
   }
   

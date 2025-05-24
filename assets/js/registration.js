@@ -5,8 +5,6 @@
 
 // DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("Registration.js: Initializing additional registration functionality");
-  
   // Set up password validation for registration form
   setupPasswordValidation();
 });
@@ -22,14 +20,11 @@ function setupPasswordValidation() {
     registerConfirmPassword.addEventListener('input', () => {
       validatePasswordMatch(registerPassword, registerConfirmPassword);
     });
-    
-    registerPassword.addEventListener('input', () => {
+      registerPassword.addEventListener('input', () => {
       validatePasswordMatch(registerPassword, registerConfirmPassword);
     });
-    
-    console.log("Registration.js: Password validation listeners added");
   } else {
-    console.log("Registration.js: Password validation elements not found on this page");
+    // Password validation elements not found on this page
   }
 }
 

@@ -751,55 +751,107 @@ function handleImageSearch(isEdit = false) {
   if (!searchTerm) {
     showNotification('Please enter a search term', 'error');
     return;
-  }
-  
-  // Clear previous results
+  }  // Clear previous results
   resultsContainer.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-warning" role="status"></div><div class="mt-2">Searching for images...</div></div>';
-    // Unsplash API configuration - using the key from api-config.js if available
-  const unsplashAccessKey = typeof apiConfig !== 'undefined' ? apiConfig.unsplash.accessKey : 'jbLyVpcZxCaNeFlbcRQ5cH_GsL8NzmotumC-RvkyZtw';
-  const endpoint = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchTerm)}&per_page=6&orientation=landscape`;
   
-  // Fetch images from Unsplash API
-  fetch(endpoint, {
-    headers: {
-      'Authorization': `Client-ID ${unsplashAccessKey}`
-    }
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`Unsplash API responded with status: ${response.status}`);
-    }
-    return response.json();
-  })
-  .then(data => {
-    // Get a fresh reference to the container to avoid any issues
+  // Use proxy endpoint to fetch images
+  const proxyEndpoint = typeof apiConfig !== 'undefined' && apiConfig.unsplash && apiConfig.unsplash.endpoint 
+    ? apiConfig.unsplash.endpoint 
+    : 'https://unsplash-proxy-app-fb6c8f079fb7.herokuapp.com/search';
+    const endpoint = `${proxyEndpoint}?q=${encodeURIComponent(searchTerm)}&per_page=6&orientation=landscape`;
+  
+  // Add timeout to the fetch request
+  const fetchWithTimeout = (url, options, timeout = 10000) => {
+    return Promise.race([
+      fetch(url, options),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timeout')), timeout)
+      )
+    ]);
+  };
+    // Fetch images from proxy endpoint (no API key needed)
+  fetchWithTimeout(endpoint)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Proxy API responded with status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Get a fresh reference to the container to avoid any issues
+      const resultsContainer = document.getElementById(resultsContainerId);
+      resultsContainer.innerHTML = '';
+      
+      if (data.results.length === 0) {
+        resultsContainer.innerHTML = '<div class="col-12 text-center py-3">No images found. Try a different search term.</div>';
+        return;
+      }
+      
+      data.results.forEach(item => {
+        const imageCol = document.createElement('div');
+        imageCol.className = 'col-4 mb-2';
+        imageCol.innerHTML = `
+          <div class="dinner-image-option" data-photographer="${item.user.name}" data-photo-url="${item.links.html}">
+            <img src="${item.urls.small}" alt="${item.alt_description || 'Food image'}" class="img-fluid rounded cursor-pointer">
+            <div class="photographer-credit small text-muted mt-1">Photo by ${item.user.name}</div>
+          </div>
+        `;
+        resultsContainer.appendChild(imageCol);
+      });
+      
+      // Add click event to select images
+      ImageUtils.setupImageSelectionForContainer(resultsContainerId);
+    })
+    .catch(error => {
+    console.error('Error fetching images from proxy:', error);
+    
     const resultsContainer = document.getElementById(resultsContainerId);
-    resultsContainer.innerHTML = '';
     
-    if (data.results.length === 0) {
-      resultsContainer.innerHTML = '<div class="col-12 text-center py-3">No images found. Try a different search term.</div>';
-      return;
-    }
+    // Try to provide fallback demo images for development
+    const fallbackImages = [
+      {
+        urls: { small: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400' },
+        alt_description: 'Delicious food',
+        user: { name: 'Demo' },
+        links: { html: '#' }
+      },
+      {
+        urls: { small: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400' },
+        alt_description: 'Gourmet dish',
+        user: { name: 'Demo' },
+        links: { html: '#' }
+      },
+      {
+        urls: { small: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400' },
+        alt_description: 'Tasty meal',
+        user: { name: 'Demo' },
+        links: { html: '#' }
+      }
+    ];
     
-    data.results.forEach(item => {
+    // Show fallback images with error message
+    resultsContainer.innerHTML = `      <div class="col-12 text-center py-2">
+        <div class="alert alert-warning">
+          <small><strong>Note:</strong> Unable to load images at the moment. Please try again later.</small>
+        </div>
+      </div>
+    `;
+    
+    // Add fallback images
+    fallbackImages.forEach(item => {
       const imageCol = document.createElement('div');
       imageCol.className = 'col-4 mb-2';
       imageCol.innerHTML = `
         <div class="dinner-image-option" data-photographer="${item.user.name}" data-photo-url="${item.links.html}">
           <img src="${item.urls.small}" alt="${item.alt_description || 'Food image'}" class="img-fluid rounded cursor-pointer">
-          <div class="photographer-credit small text-muted mt-1">Photo by ${item.user.name}</div>
+          <div class="photographer-credit small text-muted mt-1">Demo Image</div>
         </div>
       `;
       resultsContainer.appendChild(imageCol);
-    });      // Add click event to select images
+    });
+    
+    // Set up image selection for fallback images
     ImageUtils.setupImageSelectionForContainer(resultsContainerId);
-  })  .catch(error => {
-    const resultsContainer = document.getElementById(resultsContainerId);
-    resultsContainer.innerHTML = `
-      <div class="col-12 text-center py-3">
-        <div class="alert alert-danger">Error loading images. Please try again later.</div>
-      </div>
-    `;
   });
 }
 
