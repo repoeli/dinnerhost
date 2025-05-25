@@ -50,43 +50,56 @@ function setupHeroAnimations() {
   
   if (!hero || !heroBackground) return;
   
-  // Add subtle parallax effect on mouse move
+  // Throttled mouse move handler for better performance
+  let mouseThrottle = null;
   hero.addEventListener('mousemove', (e) => {
-    const xValue = e.clientX - window.innerWidth / 2;
-    const yValue = e.clientY - window.innerHeight / 2;
+    if (mouseThrottle) return;
     
-    // Subtle movement based on mouse position
-    heroBackground.style.transform = `scale(1.05) translate(${xValue * 0.01}px, ${yValue * 0.01}px)`;
+    mouseThrottle = setTimeout(() => {
+      const xValue = e.clientX - window.innerWidth / 2;
+      const yValue = e.clientY - window.innerHeight / 2;
+      
+      // More subtle movement for better performance
+      heroBackground.style.transform = `scale(1.05) translate(${xValue * 0.005}px, ${yValue * 0.005}px)`;
+      mouseThrottle = null;
+    }, 16); // ~60fps throttling
   });
   
   // Return to original position when mouse leaves
   hero.addEventListener('mouseleave', () => {
     heroBackground.style.transform = 'scale(1.05)';
-    setTimeout(() => {
-      // Resume the subtle-zoom animation after a short delay
-      heroBackground.style.animation = 'subtle-zoom 30s infinite alternate cubic-bezier(0.25, 0.1, 0.25, 1)';
-    }, 500);
-  });
-  
-  // Pause the standard animation when mouse enters to allow for parallax effect
-  hero.addEventListener('mouseenter', () => {
-    heroBackground.style.animation = 'none';
-  });
-  
-  // Add scroll-based effects
-  window.addEventListener('scroll', () => {
-    const scrollPosition = window.scrollY;
+    heroBackground.style.transition = 'transform 0.3s ease-out';
     
-    // Fade out hero elements on scroll
-    if (scrollPosition > 50) {
-      const opacity = Math.max(0, 1 - scrollPosition / 500);
-      hero.style.setProperty('--scroll-opacity', opacity.toString());
-      hero.querySelector('.hero-content').style.opacity = opacity.toString();
-    } else {
-      hero.style.setProperty('--scroll-opacity', '1');
-      hero.querySelector('.hero-content').style.opacity = '1';
-    }
+    // Reset transition after animation
+    setTimeout(() => {
+      heroBackground.style.transition = '';
+    }, 300);
   });
+  
+  // Throttled scroll handler for better performance
+  let scrollThrottle = null;
+  let ticking = false;
+  
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const scrollPosition = window.scrollY;
+        const heroContent = hero.querySelector('.hero-content');
+        
+        // Only update if elements exist and scroll position changed significantly
+        if (heroContent && scrollPosition > 50) {
+          const opacity = Math.max(0, 1 - scrollPosition / 800); // Slower fade for better performance
+          heroContent.style.opacity = opacity.toString();
+        } else if (heroContent) {
+          heroContent.style.opacity = '1';
+        }
+        
+        ticking = false;
+      });
+      
+      ticking = true;
+    }
+  }, { passive: true }); // Passive listener for better performance
 }
 
 /**

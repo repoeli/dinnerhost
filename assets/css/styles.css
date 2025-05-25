@@ -54,7 +54,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 1000px;
+  contain: layout style paint;
+  transform: translateZ(0); /* Force hardware acceleration */
 }
 
 .hero-background {
@@ -63,13 +64,12 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('../images/hero-bg.jpg');
+  background-image: url('https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
   background-size: cover;
   background-position: center;
-  transform: scale(1.05);
-  animation: subtle-zoom 30s infinite alternate cubic-bezier(0.25, 0.1, 0.25, 1);
-  will-change: transform;
-  transition: transform 0.8s ease-out;
+  transform: scale(1.05) translateZ(0); /* Force hardware acceleration */
+  will-change: auto;
+  transition: transform 0.3s ease-out;
 }
 
 .hero-overlay {
@@ -83,8 +83,6 @@ body {
     rgba(0, 0, 0, 0.65) 50%,
     rgba(0, 0, 0, 0.45) 100%);
   z-index: 1;
-  -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px);
 }
 
 .hero-content-wrapper {
@@ -92,7 +90,6 @@ body {
   z-index: 2;
   width: 100%;
   max-width: 800px;
-  transform-style: preserve-3d;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -102,18 +99,15 @@ body {
   position: relative;
   z-index: 2;
   width: 100%;
-  transform-style: preserve-3d;
   animation: fade-in 1.2s ease-out;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   padding: 2.5rem;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.2);
-  box-shadow: 0 0 40px 5px rgba(253, 126, 20, 0.15);
-  -webkit-backdrop-filter: blur(1px);
-  backdrop-filter: blur(1px);
+  background: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 40px 5px rgba(253, 126, 20, 0.1);
 }
 
-/* Hero Shimmer Effect */
+/* Optimized Hero Shimmer Effect - Reduced frequency */
 .hero::after {
   content: '';
   position: absolute;
@@ -124,15 +118,16 @@ body {
   background: linear-gradient(
     to right,
     rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.05) 40%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.05) 60%,
+    rgba(255, 255, 255, 0.03) 40%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.03) 60%,
     rgba(255, 255, 255, 0) 100%
   );
   transform: skewX(-25deg);
-  animation: heroShimmer 10s infinite ease-in-out;
+  animation: heroShimmer 20s infinite ease-in-out;
   z-index: 1;
   pointer-events: none;
+  will-change: transform;
 }
 
 @keyframes heroShimmer {
@@ -344,7 +339,7 @@ body {
   opacity: 0;
 }
 
-/* Add floating particles to the hero section */
+/* Optimized floating particles - Reduced count and frequency */
 .hero-particles {
   position: absolute;
   top: 0;
@@ -353,79 +348,54 @@ body {
   height: 100%;
   overflow: hidden;
   z-index: 1;
+  contain: layout style paint;
 }
 
 .particle {
   position: absolute;
   display: block;
   pointer-events: none;
-  width: 6px;
-  height: 6px;
-  background-color: rgba(253, 126, 20, 0.4);
+  width: 4px;
+  height: 4px;
+  background-color: rgba(253, 126, 20, 0.3);
   border-radius: 50%;
-  box-shadow: 0 0 10px 2px rgba(253, 126, 20, 0.2);
-  animation: float 15s infinite ease-in-out;
+  animation: float 25s infinite ease-in-out;
+  will-change: transform;
 }
 
 .particle:nth-child(1) {
   left: 25%;
   top: 30%;
-  animation-duration: 18s;
+  animation-duration: 30s;
   animation-delay: 0s;
 }
 
 .particle:nth-child(2) {
   left: 70%;
   top: 50%;
-  animation-duration: 22s;
-  animation-delay: 1s;
+  animation-duration: 35s;
+  animation-delay: 5s;
 }
 
 .particle:nth-child(3) {
   left: 40%;
   top: 60%;
-  animation-duration: 16s;
-  animation-delay: 2s;
-}
-
-.particle:nth-child(4) {
-  left: 65%;
-  top: 25%;
-  animation-duration: 20s;
-  animation-delay: 3s;
-}
-
-.particle:nth-child(5) {
-  left: 30%;
-  top: 70%;
-  animation-duration: 24s;
-  animation-delay: 4s;
+  animation-duration: 28s;
+  animation-delay: 10s;
 }
 
 @keyframes float {
-  0% {
+  0%, 100% {
     transform: translateY(0) translateX(0);
-    opacity: 0.3;
-  }
-  25% {
-    transform: translateY(-20px) translateX(10px);
-    opacity: 0.8;
+    opacity: 0.2;
   }
   50% {
-    transform: translateY(-40px) translateX(-5px);
+    transform: translateY(-30px) translateX(10px);
     opacity: 0.6;
-  }
-  75% {
-    transform: translateY(-20px) translateX(-15px);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(0) translateX(0);
-    opacity: 0.3;
   }
 }
 
-/* Food/Drink Steam Effect */
+/* Optimized Steam Effect - Reduced elements and frequency */
 .steam-wrapper {
   position: absolute;
   width: 100%;
@@ -435,66 +405,56 @@ body {
   display: flex;
   justify-content: center;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.4;
+  contain: layout style paint;
 }
 
 .steam {
   position: absolute;
-  height: 150px;
-  width: 150px;
+  height: 120px;
+  width: 120px;
   border-radius: 50%;
   background-color: #fff;
-  margin-top: -75px;
-  margin-left: -75px;
-  filter: blur(50px);
+  margin-top: -60px;
+  margin-left: -60px;
+  filter: blur(40px);
   opacity: 0;
-  animation: steam-rise 7s infinite ease-out;
+  animation: steam-rise 12s infinite ease-out;
   z-index: 2;
+  will-change: transform, opacity;
 }
 
 .steam:nth-child(1) {
-  left: calc(50% - 100px);
-  height: 140px;
-  width: 140px;
-  animation-delay: 0.2s;
-  animation-duration: 6s;
-  background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,154,68,0.3) 70%, rgba(255,154,68,0) 100%);
+  left: calc(50% - 80px);
+  height: 110px;
+  width: 110px;
+  animation-delay: 0.5s;
+  animation-duration: 10s;
+  background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,154,68,0.2) 70%, rgba(255,154,68,0) 100%);
 }
 
 .steam:nth-child(2) {
-  left: 50%;
-  height: 180px;
-  width: 180px;
-  animation-delay: 1.5s;
-  animation-duration: 7s;
-  background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(253,126,20,0.3) 70%, rgba(253,126,20,0) 100%);
-}
-
-.steam:nth-child(3) {
-  left: calc(50% + 120px);
-  height: 120px;
-  width: 120px;
-  animation-delay: 3s;
-  animation-duration: 8s;
-  background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,211,128,0.3) 70%, rgba(255,211,128,0) 100%);
+  left: calc(50% + 80px);
+  height: 100px;
+  width: 100px;
+  animation-delay: 6s;
+  animation-duration: 11s;
+  background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(253,126,20,0.2) 70%, rgba(253,126,20,0) 100%);
 }
 
 @keyframes steam-rise {
   0% {
-    transform: translateY(0) scale(0.5);
+    transform: translateY(0) scale(0.4);
     opacity: 0;
   }
-  15% {
-    opacity: 0.6;
+  20% {
+    opacity: 0.4;
   }
-  50% {
-    opacity: 0.3;
-  }
-  95% {
-    opacity: 0;
+  80% {
+    opacity: 0.1;
   }
   100% {
-    transform: translateY(-200px) scale(1.5);
+    transform: translateY(-150px) scale(1.2);
     opacity: 0;
   }
 }
