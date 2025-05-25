@@ -25,6 +25,14 @@ body {
   overflow-x: hidden;
 }
 
+/* Fix deprecated H1UserAgentFontSizeInSection behavior across the site */
+section h1,
+article h1,
+aside h1,
+nav h1 {
+  font-size: revert !important; /* Use parent context font-size, not user-agent section defaults */
+}
+
 /* ===== GLOBAL UTILITIES ===== */
 .text-primary-custom {
   color: var(--primary-color) !important;
@@ -307,8 +315,9 @@ body {
   }
 }
 
+/* Fix for deprecated H1UserAgentFontSizeInSection */
 .hero h1 {
-  font-size: 3.5rem;
+  font-size: 3.5rem !important; /* Override user-agent section styling */
   font-weight: 800;
   line-height: 1.2;
   margin-bottom: 1rem;
@@ -325,6 +334,7 @@ body {
   position: relative;
   z-index: 5;
   animation: text-glow 3s infinite alternate ease-in-out, fadeInUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  margin-top: 0; /* Reset margin to prevent user-agent defaults */
 }
 
 .hero p.lead {
@@ -1561,9 +1571,8 @@ body {
     min-height: 60vh;
     padding: 4rem 0 3rem;
   }
-  
-  .hero h1 {
-    font-size: 2.5rem;
+    .hero h1 {
+    font-size: 2.5rem !important; /* Override user-agent section styling */
     margin-top: 0;
     margin-bottom: 1rem;
   }
@@ -1596,9 +1605,8 @@ body {
     min-height: 80vh;
     padding: 4.5rem 0 2.5rem;
   }
-  
-  .hero h1 {
-    font-size: 2.2rem;
+    .hero h1 {
+    font-size: 2.2rem !important; /* Override user-agent section styling */
     line-height: 1.2;
   }
   
