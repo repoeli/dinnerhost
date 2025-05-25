@@ -82,6 +82,8 @@ tmp/
 # Test files (cleaned up but keeping pattern for future)
 test-*.html
 *-test.*
+*test*
+*debug*
 debug-*.*
 validation-*.*
 
