@@ -112,12 +112,16 @@ function handleRegistration(e) {
 
   // Note: We don't call DataManager.saveData() for the main users array 
   // since we want to keep JSON users separate from newly registered users
-
   // Get user data without password for localStorage
   const { password: _, ...userWithoutPassword } = newUser;
 
   // Store user in localStorage (login the user)
   localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
+  
+  // Make sure currentUser variable is updated too (for script.js)
+  if (typeof window.currentUser !== 'undefined') {
+    window.currentUser = userWithoutPassword;
+  }
 
   // Show success notification
   showNotification(`Welcome, ${fullName}! Your account has been created successfully.`, 'success');

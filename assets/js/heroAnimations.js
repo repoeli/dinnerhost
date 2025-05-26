@@ -1,122 +1,144 @@
 /**
- * Enhanced Hero Animations
- * Adds subtle parallax and animation effects to the hero section
+ * Optimized Hero Animations - Performance Focused
+ * Prevents layout shifts and improves Core Web Vitals
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Apply enhanced animations to hero section
-  setupHeroAnimations();
+// Use immediate execution to reduce delays
+(function() {
+  'use strict';
   
-  // Setup explore dinners button
-  setupExploreDinnersButton();
+  // Cache DOM elements for better performance
+  let cachedElements = {};
   
-  // Setup search focus effects
-  setupSearchFocusEffects();
-});
-
-/**
- * Sets up the Explore Dinners button click handler
- * Handles smooth scrolling to the featured dinners section and focusing the search input
- */
-function setupExploreDinnersButton() {
-  const exploreBtn = document.getElementById('exploreDinnersBtn');
-  if (!exploreBtn) return;
-  
-  exploreBtn.addEventListener('click', () => {
-    const featuredSection = document.getElementById('featured-dinners');
-    if (featuredSection) {
-      featuredSection.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-      
-      // Focus the search box when scrolled to
-      setTimeout(() => {
-        const searchInput = document.getElementById('heroSearch');
-        if (searchInput) {
-          searchInput.focus();
-        }
-      }, 800); // Delay to wait for the scroll to complete
+  function getCachedElement(id) {
+    if (!cachedElements[id]) {
+      cachedElements[id] = document.getElementById(id);
     }
-  });
-}
-
-/**
- * Sets up enhanced animations for the hero section
- */
-function setupHeroAnimations() {
-  const hero = document.querySelector('.hero');
-  const heroBackground = document.querySelector('.hero-background');
+    return cachedElements[id];
+  }
   
-  if (!hero || !heroBackground) return;
-  
-  // Throttled mouse move handler for better performance
-  let mouseThrottle = null;
-  hero.addEventListener('mousemove', (e) => {
-    if (mouseThrottle) return;
+  // Setup explore dinners button immediately when DOM is ready
+  function setupExploreDinnersButton() {
+    const exploreBtn = getCachedElement('exploreDinnersBtn');
+    if (!exploreBtn) return;
     
-    mouseThrottle = setTimeout(() => {
-      const xValue = e.clientX - window.innerWidth / 2;
-      const yValue = e.clientY - window.innerHeight / 2;
+    exploreBtn.addEventListener('click', function(e) {
+      e.preventDefault();
       
-      // More subtle movement for better performance
-      heroBackground.style.transform = `scale(1.05) translate(${xValue * 0.005}px, ${yValue * 0.005}px)`;
-      mouseThrottle = null;
-    }, 16); // ~60fps throttling
-  });
+      const featuredSection = getCachedElement('featured-dinners');
+      if (featuredSection) {
+        // Use requestAnimationFrame for smoother performance
+        requestAnimationFrame(function() {
+          featuredSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+          
+          // Focus the search box with optimized timing
+          setTimeout(function() {
+            const searchInput = getCachedElement('heroSearch');
+            if (searchInput && typeof searchInput.focus === 'function') {
+              try {
+                searchInput.focus();
+              } catch (e) {
+                // Ignore focus errors in case element is not focusable
+              }
+            }
+          }, 800);
+        });
+      }
+    }, { passive: false });
+  }
   
-  // Return to original position when mouse leaves
-  hero.addEventListener('mouseleave', () => {
-    heroBackground.style.transform = 'scale(1.05)';
-    heroBackground.style.transition = 'transform 0.3s ease-out';
+  // Setup search focus effects with performance optimization
+  function setupSearchFocusEffects() {
+    const searchInput = getCachedElement('heroSearch');
+    const searchContainer = document.querySelector('.dinner-search-container');
     
-    // Reset transition after animation
-    setTimeout(() => {
-      heroBackground.style.transition = '';
-    }, 300);
-  });
-  
-  // Throttled scroll handler for better performance
-  let scrollThrottle = null;
-  let ticking = false;
-  
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        const scrollPosition = window.scrollY;
-        const heroContent = hero.querySelector('.hero-content');
-        
-        // Only update if elements exist and scroll position changed significantly
-        if (heroContent && scrollPosition > 50) {
-          const opacity = Math.max(0, 1 - scrollPosition / 800); // Slower fade for better performance
-          heroContent.style.opacity = opacity.toString();
-        } else if (heroContent) {
-          heroContent.style.opacity = '1';
-        }
-        
-        ticking = false;
+    if (!searchInput || !searchContainer) return;
+    
+    // Use passive listeners for better performance
+    searchInput.addEventListener('focus', function() {
+      requestAnimationFrame(function() {
+        searchContainer.classList.add('search-focused');
       });
-      
-      ticking = true;
+    }, { passive: true });
+    
+    searchInput.addEventListener('blur', function() {
+      requestAnimationFrame(function() {
+        searchContainer.classList.remove('search-focused');
+      });
+    }, { passive: true });
+  }
+  
+  // Optimized lazy loading with reduced overhead
+  function lazyLoadNonCriticalSections() {
+    // Check for Intersection Observer support
+    if (!('IntersectionObserver' in window)) {
+      // Fallback for older browsers - just add visible class
+      const sections = document.querySelectorAll('.stats-section, .featured-dinners-section');
+      sections.forEach(function(section) {
+        section.classList.add('visible');
+      });
+      return;
     }
-  }, { passive: true }); // Passive listener for better performance
-}
-
-/**
- * Sets up enhanced focus effects for the search input
- */
-function setupSearchFocusEffects() {
-  const searchInput = document.getElementById('heroSearch');
-  const searchContainer = document.querySelector('.dinner-search-container');
+    
+    const lazyLoadSections = document.querySelectorAll('.stats-section, .featured-dinners-section');
+    if (lazyLoadSections.length === 0) return;
+    
+    const sectionObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          requestAnimationFrame(function() {
+            entry.target.classList.add('visible');
+          });
+          sectionObserver.unobserve(entry.target);
+        }
+      });
+    }, {
+      rootMargin: '50px', // Reduced from 100px for better performance
+      threshold: 0.1
+    });
+    
+    lazyLoadSections.forEach(function(section) {
+      sectionObserver.observe(section);
+    });
+  }
   
-  if (!searchInput || !searchContainer) return;
+  // Prevent layout shifts by ensuring hero content is stable
+  function stabilizeHeroLayout() {
+    const hero = document.querySelector('.hero');
+    const heroContent = document.querySelector('.hero-content');
+    
+    if (hero && heroContent) {
+      // Force layout stability
+      hero.style.containIntrinsicSize = '100vw 80vh';
+      heroContent.style.contain = 'layout style';
+      
+      // Add preload class for smooth fade-in
+      heroContent.classList.add('hero-preload');
+    }
+  }
   
-  // Add focus effects
-  searchInput.addEventListener('focus', () => {
-    searchContainer.classList.add('search-focused');
-  });
+  // Initialize everything when DOM is ready
+  function init() {
+    setupExploreDinnersButton();
+    setupSearchFocusEffects();
+    stabilizeHeroLayout();
+    
+    // Delay non-critical operations
+    if (window.requestIdleCallback) {
+      window.requestIdleCallback(lazyLoadNonCriticalSections);
+    } else {
+      setTimeout(lazyLoadNonCriticalSections, 100);
+    }
+  }
   
-  searchInput.addEventListener('blur', () => {
-    searchContainer.classList.remove('search-focused');
-  });
-}
+  // Use DOMContentLoaded for faster initialization
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  
+})();

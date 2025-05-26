@@ -86,6 +86,20 @@ test-*.html
 *debug*
 debug-*.*
 validation-*.*
+*analyze*
+*final*
+*MODERNIZATION.md
+*OPTIMIZATIONS.md
+*SUMMARY.md
+*FIXES*
+*FIX.md
+*FIX_*
+*optimization*
+*test*
+*optimized.jpg
+*validate*
+*optimize.js
+*verify*
 
 # Build files
 build/

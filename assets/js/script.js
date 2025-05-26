@@ -218,23 +218,45 @@ function setupEventListeners() {  // Check if we're on the host dashboard page (
   
   // Filter buttons
   setupFilterListeners();
-    // Authentication forms (global, needed on all pages)
+  // Authentication forms (global, needed on all pages)
   const loginForm = document.getElementById('loginForm');
   const registerForm = document.getElementById('registerForm');
   
   if (loginForm) {
-    loginForm.addEventListener('submit', handleLogin);
+    // Remove any existing handlers by cloning the form
+    const newLoginForm = loginForm.cloneNode(true);
+    if (loginForm.parentNode) {
+      loginForm.parentNode.replaceChild(newLoginForm, loginForm);
+    }
+    
+    // Add the handleLogin listener
+    newLoginForm.addEventListener('submit', handleLogin);
   }
   
   if (registerForm) {
     registerForm.addEventListener('submit', handleRegister);
-  }
-  
-  // Logout button (only if not already handled by specific dashboard)
+  }    // Logout button (only if not already handled by specific dashboard)
   if (!isHostDashboard && !window.location.pathname.includes('guest-dashboard.html')) {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-      logoutBtn.addEventListener('click', handleLogout);
+      // Remove any existing listeners and add a fresh one
+      const newLogoutBtn = logoutBtn.cloneNode(true);
+      if (logoutBtn.parentNode) {
+        logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+      }
+      
+      newLogoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Logout clicked in script.js');
+        
+        // Use the global performLogout if available
+        if (typeof window.performLogout === 'function') {
+          window.performLogout();
+        } else {
+          handleLogout();
+        }
+      });
     }
   }
   
@@ -306,6 +328,22 @@ function checkUserLoginStatus() {
  * Update the UI based on whether a user is logged in or not
  */
 function updateUIForUserStatus() {
+  // Re-check user login status to ensure we have the latest
+  checkUserLoginStatus();
+  
+  // Get user from localStorage if not in global variable
+  if (!currentUser) {
+    try {
+      const userStr = localStorage.getItem('currentUser');
+      if (userStr) {
+        currentUser = JSON.parse(userStr);
+        console.log("Updated currentUser from localStorage:", currentUser.email);
+      }
+    } catch (e) {
+      console.error("Error parsing currentUser:", e);
+    }
+  }
+  
   const authButtons = document.querySelectorAll('.auth-dependent');
   const guestButtons = document.querySelectorAll('.guest-only');
   const hostButtons = document.querySelectorAll('.host-only');
@@ -314,6 +352,7 @@ function updateUIForUserStatus() {
   
   if (currentUser) {
     // User is logged in
+    console.log("Updating UI for logged in user:", currentUser.email, "Type:", currentUser.type);
     authButtons.forEach(el => el.classList.remove('d-none'));
     
     // Show/hide elements based on user type
@@ -329,18 +368,38 @@ function updateUIForUserStatus() {
     userNameElements.forEach(el => {
       el.textContent = currentUser.name;
     });
-      // Hide login button if present
-    if (loginBtn) loginBtn.classList.add('d-none');
-  } else {
+    
+    // Ensure the logout button is visible and properly set up
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.style.display = 'block';
+      if (logoutBtn.parentElement) {
+        logoutBtn.parentElement.style.display = 'block';
+      }
+    }
+    
+    // Hide login button if present
+    if (loginBtn) loginBtn.classList.add('d-none');} else {
     // No user is logged in
     authButtons.forEach(el => el.classList.add('d-none'));
     hostButtons.forEach(el => el.classList.add('d-none'));
     guestButtons.forEach(el => el.classList.add('d-none'));
-    
-    // Show login button if present
-    if (loginBtn) loginBtn.classList.remove('d-none');
-  }
+      // Show login button if present
+    if (loginBtn) {
+      loginBtn.classList.remove('d-none');
+      loginBtn.style.display = '';
+      loginBtn.style.visibility = 'visible';
+      loginBtn.style.opacity = '1';
+      
+      // Call the special function to ensure login button is fully visible
+      if (typeof forceLoginButtonVisibility === 'function') {
+        forceLoginButtonVisibility();
+      }
+    }  }
 }
+
+// Expose updateUIForUserStatus globally to be used by other scripts
+window.updateUIForUserStatus = updateUIForUserStatus;
 
 /**
  * Handle the login form submission
@@ -1280,6 +1339,100 @@ async function handleReservation(e) {
 function formatDate(dateString) {
   const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
   return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
+// Force update the login/logout UI elements
+// This is a special function to ensure UI correctly reflects login state
+// especially for the home page after logout
+function forceLoginUIUpdate() {
+  // Reset all UI elements first
+  const authElements = document.querySelectorAll('.auth-dependent');
+  const guestButtons = document.querySelectorAll('.guest-only');
+  const hostButtons = document.querySelectorAll('.host-only');
+  
+  // Hide auth-dependent elements
+  authElements.forEach(el => {
+    el.classList.add('d-none');
+    el.style.display = 'none';
+  });
+  
+  // Hide role-specific elements
+  guestButtons.forEach(el => {
+    el.classList.add('d-none');
+    el.style.display = 'none';
+  });
+  
+  hostButtons.forEach(el => {
+    el.classList.add('d-none');
+    el.style.display = 'none';
+  });
+  
+  // Show/hide login button based on login state
+  const loginBtn = document.getElementById('loginBtn');
+  if (loginBtn) {
+    if (!currentUser) {
+      // User is logged out - show login button
+      loginBtn.classList.remove('d-none');
+      loginBtn.style.display = '';
+      loginBtn.style.visibility = 'visible';
+      loginBtn.style.opacity = '1';
+    } else {
+      // User is logged in - hide login button
+      loginBtn.classList.add('d-none');
+      loginBtn.style.display = 'none';
+    }
+  }
+  
+  // Update user dropdown if logged in
+  if (currentUser) {
+    authElements.forEach(el => {
+      el.classList.remove('d-none');
+      el.style.display = '';
+    });
+    
+    // Show/hide elements based on user type
+    if (currentUser.type === 'host') {
+      hostButtons.forEach(el => {
+        el.classList.remove('d-none');
+        el.style.display = '';
+      });
+    } else {
+      guestButtons.forEach(el => {
+        el.classList.remove('d-none');
+        el.style.display = '';
+      });
+    }
+  }
+}
+
+/**
+ * Ensure login button is visible after logout on homepage
+ * This function is a special fix for the login button visibility issue on homepage
+ */
+function forceLoginButtonVisibility() {
+  const loginBtn = document.getElementById('loginBtn');
+  
+  if (loginBtn) {
+    // Remove any display:none styling
+    loginBtn.style.display = '';
+    
+    // Remove Bootstrap d-none class
+    loginBtn.classList.remove('d-none');
+    
+    // Ensure visibility
+    loginBtn.style.visibility = 'visible';
+    loginBtn.style.opacity = '1';
+    
+    // If button is inside a container, make sure it's visible too
+    const parentLi = loginBtn.closest('li');
+    if (parentLi) {
+      parentLi.style.display = '';
+      parentLi.classList.remove('d-none');
+    }
+  }
+  
+  // Return true if button exists
+  return !!loginBtn;
 }
 
 // Note: Filter count functionality has been moved to handleHeroSearch.js

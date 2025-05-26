@@ -1,0 +1,14 @@
+This is a placeholder for the optimized hero image. In a real scenario, you would convert the hero-img.jpg to WebP format using:
+
+1. Image optimization tools like ImageMagick:
+   `magick convert hero-img.jpg -resize 1920x -quality 80 -define webp:lossless=false hero-img-optimized.webp`
+
+2. Online services like Squoosh.app, TinyPNG, or ImageOptim
+
+3. Build tools like Webpack with image-webpack-loader
+
+The optimized image should be:
+- Converted to WebP format (with JPG fallback for older browsers)
+- Resized to appropriate dimensions (1920px width maximum)
+- Compressed to reduce file size
+- Properly sized for the viewport

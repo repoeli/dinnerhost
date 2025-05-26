@@ -32,19 +32,38 @@ async function initHostDashboard() {
       showNotification('Critical application error. Please contact support.', 'error');
       return;
     }
-
-    // Check if user is logged in and is a host
-    if (!currentUser) {
+    
+    // Try to get the current user from both global variable and LoginFix
+    let hostUser = currentUser;
+    
+    // If not available from global, try to get from LoginFix
+    if (!hostUser && typeof window.LoginFix !== 'undefined' && window.LoginFix.getCurrentUser) {
+      hostUser = window.LoginFix.getCurrentUser();
+      
+      // Sync with global variable if found
+      if (hostUser) {
+        currentUser = hostUser;
+        console.log("Synchronized user from LoginFix:", hostUser.email);
+      }
+    }
+    
+    // Check if user is logged in
+    if (!hostUser) {
+      console.log("No user is logged in, redirecting to index.html");
       // Redirect to login if not logged in
       window.location.href = 'index.html';
       return;
     }
     
-    if (currentUser.type !== 'host') {
+    // Check if user is a host
+    if (hostUser.type !== 'host') {
+      console.log("User is not a host, redirecting to guest dashboard. User type:", hostUser.type);
       // Redirect to guest dashboard if not a host
       window.location.href = 'guest-dashboard.html';
       return;
     }
+    
+    console.log("Host user authenticated:", hostUser.name, "Email:", hostUser.email);
       // Set user name in navbar
     const navUsername = document.getElementById('navUsername');
     if (navUsername) {
@@ -264,11 +283,25 @@ function updateDashboardStats() {
  * Set up event listeners for the host dashboard
  */
 function setupHostDashboardEvents() {
+  // The user dropdown is now handled by dropdown-fix.js
+  // This avoids duplication and ensures consistent behavior
+  
   // Logout button
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', handleLogout);
-  }  // Create dinner button
+    // Remove any existing event listeners by cloning the button
+    const newLogoutBtn = logoutBtn.cloneNode(true);
+    if (logoutBtn.parentNode) {
+      logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+    }
+    
+    // Add a fresh event listener
+    newLogoutBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleLogout();
+    });
+  }// Create dinner button
   const createDinnerBtn = document.getElementById('createDinnerBtn');  if (createDinnerBtn) {
     createDinnerBtn.addEventListener('click', () => {
       try {
@@ -470,16 +503,12 @@ async function handleCreateDinner(e) {
     imageAttribution: {
       photographerName,
       photoUrl
-    }  };    // Add to dinners array
+    }  };
+  
+  // Add to dinners array
   dinners.push(newDinner);
-  
-  // Save to the newly created dinners localStorage key for persistence across page reloads
-  const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
-  newlyCreatedDinners.push(newDinner);
-  DataManager.saveData('newlyCreatedDinners', newlyCreatedDinners);
-  
-  // Save data to storage
-  DataManager.saveAllGlobalData();
+    // Save data to storage
+  DataManager.saveData();
   
   // Close modal
   ModalManager.hide('createDinnerModal');
@@ -563,7 +592,8 @@ function handleEditDinner(e) {
     showNotification('Dinner not found for update', 'error');
     return;
   }
-    // Update dinner object
+  
+  // Update dinner object
   dinners[dinnerIndex] = {
     ...dinners[dinnerIndex],
     title,
@@ -571,27 +601,17 @@ function handleEditDinner(e) {
     time,
     description,
     price,
-    maxGuests,
-    image,
+    maxGuests,    image,
     isPublic,
     category,
     updatedAt: new Date().toISOString(),
     imageAttribution: {
       photographerName,
-      photoUrl
-    }
+      photoUrl    }
   };
   
-  // Update the dinner in newlyCreatedDinners localStorage if it exists there
-  const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
-  const newlyCreatedIndex = newlyCreatedDinners.findIndex(d => d.id.toString() === dinnerId.toString());
-  if (newlyCreatedIndex !== -1) {
-    newlyCreatedDinners[newlyCreatedIndex] = dinners[dinnerIndex];
-    DataManager.saveData('newlyCreatedDinners', newlyCreatedDinners);
-  }
-  
   // Save data to storage
-  DataManager.saveAllGlobalData();
+  DataManager.saveData();
   
   // Close modal
   ModalManager.hide('editDinnerModal');
@@ -633,23 +653,16 @@ function handleDeleteDinner() {
     showNotification('Dinner not found for deletion', 'error');
     return;
   }
-    // Remove dinner
+  
+  // Remove dinner
   dinners.splice(dinnerIndex, 1);
-  
-  // Also remove from newlyCreatedDinners localStorage if it exists there
-  const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
-  const updatedNewlyCreatedDinners = newlyCreatedDinners.filter(d => d.id.toString() !== dinnerId.toString());
-  if (updatedNewlyCreatedDinners.length !== newlyCreatedDinners.length) {
-    DataManager.saveData('newlyCreatedDinners', updatedNewlyCreatedDinners);
-  }
-  
-  // Also remove associated reservations
+    // Also remove associated reservations
   const updatedReservations = reservations.filter(r => r.dinnerId !== dinnerId);
   reservations.length = 0;
   reservations.push(...updatedReservations);
   
   // Save data to storage
-  DataManager.saveAllGlobalData();
+  DataManager.saveData();
   
   // Close modal
   ModalManager.hide('deleteConfirmModal');
@@ -778,7 +791,10 @@ function handleImageSearch(isEdit = false) {
   const proxyEndpoint = typeof apiConfig !== 'undefined' && apiConfig.unsplash && apiConfig.unsplash.endpoint 
     ? apiConfig.unsplash.endpoint 
     : 'https://unsplash-proxy-app-fb6c8f079fb7.herokuapp.com/search';
-    const endpoint = `${proxyEndpoint}?q=${encodeURIComponent(searchTerm)}&per_page=6&orientation=landscape`;
+  
+  const endpoint = `${proxyEndpoint}?q=${encodeURIComponent(searchTerm)}&per_page=6&orientation=landscape`;
+  
+  console.log('Fetching images from:', endpoint); // Debug log
   
   // Add timeout to the fetch request
   const fetchWithTimeout = (url, options, timeout = 10000) => {
@@ -789,46 +805,128 @@ function handleImageSearch(isEdit = false) {
       )
     ]);
   };
-    // Fetch images from proxy endpoint (no API key needed)
+  
+  // Fetch images from proxy endpoint (no API key needed)
   fetchWithTimeout(endpoint)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Proxy API responded with status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      // Get a fresh reference to the container to avoid any issues
-      const resultsContainer = document.getElementById(resultsContainerId);
-      resultsContainer.innerHTML = '';
-      
-      if (data.results.length === 0) {
-        resultsContainer.innerHTML = '<div class="col-12 text-center py-3">No images found. Try a different search term.</div>';
-        return;
-      }
-      
-      data.results.forEach(item => {
-        const imageCol = document.createElement('div');
-        imageCol.className = 'col-4 mb-2';
-        imageCol.innerHTML = `
-          <div class="dinner-image-option" data-photographer="${item.user.name}" data-photo-url="${item.links.html}">
-            <img src="${item.urls.small}" alt="${item.alt_description || 'Food image'}" class="img-fluid rounded cursor-pointer">
-            <div class="photographer-credit small text-muted mt-1">Photo by ${item.user.name}</div>
-          </div>
-        `;
-        resultsContainer.appendChild(imageCol);
-      });
-      
-      // Add click event to select images
-      ImageUtils.setupImageSelectionForContainer(resultsContainerId);
-    })    .catch(error => {    const resultsContainer = document.getElementById(resultsContainerId);
+  .then(response => {
+    console.log('Response status:', response.status); // Debug log
+    if (!response.ok) {
+      throw new Error(`Proxy API responded with status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    // Get a fresh reference to the container to avoid any issues
+    const resultsContainer = document.getElementById(resultsContainerId);
+    resultsContainer.innerHTML = '';
     
-    // Show error message if images can't be loaded
-    resultsContainer.innerHTML = `<div class="col-12 text-center py-2">
-        <div class="alert alert-warning">
-          <small><strong>Note:</strong> Unable to load images at the moment. Please try again later.</small>
+    if (data.results.length === 0) {
+      resultsContainer.innerHTML = '<div class="col-12 text-center py-3">No images found. Try a different search term.</div>';
+      return;
+    }
+    
+    data.results.forEach(item => {
+      const imageCol = document.createElement('div');
+      imageCol.className = 'col-4 mb-2';
+      imageCol.innerHTML = `
+        <div class="dinner-image-option" data-photographer="${item.user.name}" data-photo-url="${item.links.html}">
+          <img src="${item.urls.small}" alt="${item.alt_description || 'Food image'}" class="img-fluid rounded cursor-pointer">
+          <div class="photographer-credit small text-muted mt-1">Photo by ${item.user.name}</div>
         </div>
-      </div>`;
+      `;
+      resultsContainer.appendChild(imageCol);
+    });      // Add click event to select images
+    ImageUtils.setupImageSelectionForContainer(resultsContainerId);
+  })  .catch(error => {
+    console.error('Error fetching images from proxy:', error);
+    console.log('Full error details:', error.message); // Debug log
+    
+    const resultsContainer = document.getElementById(resultsContainerId);
+    
+    // Try to provide fallback demo images for development
+    const fallbackImages = [
+      {
+        urls: { small: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400' },
+        alt_description: 'Delicious food',
+        user: { name: 'Demo' },
+        links: { html: '#' }
+      },
+      {
+        urls: { small: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400' },
+        alt_description: 'Gourmet dish',
+        user: { name: 'Demo' },
+        links: { html: '#' }
+      },
+      {
+        urls: { small: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400' },
+        alt_description: 'Tasty meal',
+        user: { name: 'Demo' },
+        links: { html: '#' }
+      }
+    ];
+    
+    // Show fallback images with error message
+    resultsContainer.innerHTML = `
+      <div class="col-12 text-center py-2">
+        <div class="alert alert-warning">
+          <small><strong>Note:</strong> Using demo images. Proxy may be starting up (this is normal for free Heroku apps).<br>
+          Error: ${error.message}</small>
+        </div>
+      </div>
+    `;
+    
+    // Add fallback images
+    fallbackImages.forEach(item => {
+      const imageCol = document.createElement('div');
+      imageCol.className = 'col-4 mb-2';
+      imageCol.innerHTML = `
+        <div class="dinner-image-option" data-photographer="${item.user.name}" data-photo-url="${item.links.html}">
+          <img src="${item.urls.small}" alt="${item.alt_description || 'Food image'}" class="img-fluid rounded cursor-pointer">
+          <div class="photographer-credit small text-muted mt-1">Demo Image</div>
+        </div>
+      `;
+      resultsContainer.appendChild(imageCol);
+    });
+    
+    // Set up image selection for fallback images
+    ImageUtils.setupImageSelectionForContainer(resultsContainerId);
   });
+}
+
+/**
+ * Handle user logout
+ * Uses the enhanced logout utility for proper UI refresh and redirection
+ */
+function handleLogout() {
+  console.log('Logout function called in host-dashboard.js');
+  
+  // Use the confirmLogout function from logout-util.js
+  if (typeof window.confirmLogout === 'function') {
+    window.confirmLogout();
+    return;
+  }
+  
+  // Fallback to performLogout if confirm isn't available
+  if (typeof window.performLogout === 'function') {
+    window.performLogout();
+    return;
+  }
+  
+  // Ultimate fallback logout logic
+  currentUser = null;
+  localStorage.removeItem('currentUser');
+  
+  // Show notification if the function exists
+  if (typeof showNotification === 'function') {
+    showNotification('You have been logged out', 'info');
+  } else {
+    alert('You have been logged out');
+  }
+  
+  // Add a small delay before redirecting to ensure localStorage changes are saved
+  setTimeout(() => {
+    // Redirect to home page
+    window.location.href = 'index.html';
+  }, 100);
 }
 

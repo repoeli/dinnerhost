@@ -20,7 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
 async function initGuestDashboard() {
   try {
     // Ensure global data is loaded first from script.js
-    if (typeof loadData === 'function') {      await loadData(); // Wait for data from script.js to be loaded
+    if (typeof loadData === 'function') {
+      await loadData(); // Wait for data from script.js to be loaded
     } else {
       if (typeof showNotification === 'function') {
         showNotification('Critical application error. Please contact support.', 'error');
@@ -35,9 +36,16 @@ async function initGuestDashboard() {
       return;
     }
     
-    // Set user name in navbar and welcome message
-    document.getElementById('navUsername').textContent = currentUser.name;
-    document.getElementById('guestName').textContent = currentUser.name;
+    // Set user name in navbar and welcome message - with null checks
+    const navUsername = document.getElementById('navUsername');
+    if (navUsername) {
+      navUsername.textContent = currentUser.name;
+    }
+    
+    const guestName = document.getElementById('guestName');
+    if (guestName) {
+      guestName.textContent = currentUser.name;
+    }
     
     // Load guest's reservations
     await loadGuestReservations();
@@ -67,18 +75,38 @@ function checkUserLoginStatus() {
 
 /**
  * Handle user logout
- * Clears user data from localStorage and redirects to home page
+ * Uses the enhanced logout utility for proper UI refresh and redirection
  */
 function handleLogout() {
-  // Clear user data
+  console.log('Logout function called in guest-dashboard.js');
+  
+  // Use the confirmLogout function from logout-util.js
+  if (typeof window.confirmLogout === 'function') {
+    window.confirmLogout();
+    return;
+  }
+  
+  // Fallback to performLogout if confirm isn't available
+  if (typeof window.performLogout === 'function') {
+    window.performLogout();
+    return;
+  }
+  
+  // Ultimate fallback logout logic
   currentUser = null;
   localStorage.removeItem('currentUser');
   
-  // Show notification
-  showNotification('You have been logged out', 'info');
-  
-  // Redirect to home page
-  window.location.href = 'index.html';
+  // Show notification if the function exists
+  if (typeof showNotification === 'function') {
+    showNotification('You have been logged out', 'info');
+  } else {
+    alert('You have been logged out');
+  }
+    // Add a small delay before redirecting to ensure localStorage changes are saved
+  setTimeout(() => {
+    // Redirect to home page
+    window.location.href = 'index.html';
+  }, 100);
 }
 
 // ===== DATA LOADING =====
@@ -89,55 +117,75 @@ function handleLogout() {
  * @returns {Object} Object containing arrays of upcoming and past reservations
  */
 async function loadGuestReservations() {
-  // Make sure we have the latest data by ensuring script.js's loadData has completed.
-  // The initGuestDashboard already awaits loadData(), so `dinners`, `reservations`, `users` should be populated.
+  try {
+    // Make sure we have the latest data by ensuring script.js's loadData has completed.
+    // The initGuestDashboard already awaits loadData(), so `dinners`, `reservations`, `users` should be populated.
 
-  // Find reservations by matching user ID, email, or name
-  const guestReservations = findGuestReservations();
-  
-  // Sort and organize reservations by date
-  const now = new Date();
-  const upcomingReservations = [];
-  const pastReservations = [];
-  
-  guestReservations.forEach(reservation => {
-    // Find associated dinner
-    const dinner = dinners.find(d => d.id === reservation.dinnerId);
-    if (!dinner) return; // Skip if dinner not found
-    
-    // Determine if past or upcoming
-    const dinnerDate = new Date(`${dinner.date}T${dinner.time}`);
-    
-    if (dinnerDate >= now) {
-      upcomingReservations.push({ reservation, dinner });
-    } else {
-      pastReservations.push({ reservation, dinner });
+    // Check if required arrays are defined
+    if (!Array.isArray(dinners) || !Array.isArray(reservations)) {
+      console.warn("Required data arrays are not properly initialized");
+      displayEmptyStates();
+      return { upcoming: [], past: [] };
     }
-  });
+
+    // Find reservations by matching user ID, email, or name
+    const guestReservations = findGuestReservations();
+    
+    // Sort and organize reservations by date
+    const now = new Date();
+    const upcomingReservations = [];
+    const pastReservations = [];
+    
+    guestReservations.forEach(reservation => {
+      // Find associated dinner
+      const dinner = dinners.find(d => d && d.id === reservation.dinnerId);
+      if (!dinner) return; // Skip if dinner not found
+      
+      // Determine if past or upcoming
+      const dinnerDate = new Date(`${dinner.date}T${dinner.time}`);
+      
+      if (dinnerDate >= now) {
+        upcomingReservations.push({ reservation, dinner });
+      } else {
+        pastReservations.push({ reservation, dinner });
+      }
+    });
   
-  // Sort upcoming by date (soonest first)
-  upcomingReservations.sort((a, b) => {
-    const dateA = new Date(`${a.dinner.date}T${a.dinner.time}`);
-    const dateB = new Date(`${b.dinner.date}T${b.dinner.time}`);
-    return dateA - dateB;
-  });
-  
-  // Sort past by date (most recent first)
-  pastReservations.sort((a, b) => {
-    const dateA = new Date(`${a.dinner.date}T${a.dinner.time}`);
-    const dateB = new Date(`${b.dinner.date}T${b.dinner.time}`);
-    return dateB - dateA;
-  });
-  
-  // Update badge counts
-  document.getElementById('upcomingCount').textContent = upcomingReservations.length;
-  document.getElementById('pastCount').textContent = pastReservations.length;
-  
-  // Display reservations
-  displayUpcomingReservations(upcomingReservations);
-  displayPastReservations(pastReservations);
-  
-  return { upcoming: upcomingReservations, past: pastReservations };
+    // Sort upcoming by date (soonest first)
+    upcomingReservations.sort((a, b) => {
+      const dateA = new Date(`${a.dinner.date}T${a.dinner.time}`);
+      const dateB = new Date(`${b.dinner.date}T${b.dinner.time}`);
+      return dateA - dateB;
+    });
+    
+    // Sort past by date (most recent first)
+    pastReservations.sort((a, b) => {
+      const dateA = new Date(`${a.dinner.date}T${a.dinner.time}`);
+      const dateB = new Date(`${b.dinner.date}T${b.dinner.time}`);
+      return dateB - dateA;
+    });
+    
+    // Update badge counts with null checks
+    const upcomingCount = document.getElementById('upcomingCount');
+    if (upcomingCount) {
+      upcomingCount.textContent = upcomingReservations.length;
+    }
+    
+    const pastCount = document.getElementById('pastCount');
+    if (pastCount) {
+      pastCount.textContent = pastReservations.length;
+    }
+    
+    // Display reservations
+    displayUpcomingReservations(upcomingReservations);
+    displayPastReservations(pastReservations);
+    
+    return { upcoming: upcomingReservations, past: pastReservations };
+  } catch (error) {
+    console.error("Error loading guest reservations:", error);
+    displayEmptyStates();
+    return { upcoming: [], past: [] };
+  }
 }
 
 /**
@@ -146,8 +194,22 @@ async function loadGuestReservations() {
  * @returns {Array} Array of reservation objects
  */
 function findGuestReservations() {
+  // Check if reservations is defined and is an array
+  if (!Array.isArray(reservations)) {
+    console.warn("Reservations is not an array or undefined");
+    return [];
+  }
+  
+  // Make sure currentUser is defined to avoid errors
+  if (!currentUser) {
+    console.warn("Current user is not defined");
+    return [];
+  }
+
   // Try to match by user ID, email, and name to catch all possible reservations
   const guestReservations = reservations.filter(r => {
+    if (!r) return false; // Skip null/undefined reservations
+    
     // If the reservation has a userId, match by that first (most reliable)
     if (r.userId && currentUser.id && r.userId.toString() === currentUser.id.toString()) {
       return true;
@@ -164,8 +226,6 @@ function findGuestReservations() {
     // Return true if any of the conditions match
     return emailMatch || nameMatch;
   });
-  
-  
   
   return guestReservations;
 }
@@ -372,10 +432,24 @@ function formatCategory(category) {
  * Set up event listeners for the guest dashboard
  */
 function setupGuestDashboardEvents() {
+  // The user dropdown is now handled by dropdown-fix.js
+  // This avoids duplication and ensures consistent behavior
+  
   // Logout button
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', handleLogout);
+    // Remove any existing event listeners by cloning the button
+    const newLogoutBtn = logoutBtn.cloneNode(true);
+    if (logoutBtn.parentNode) {
+      logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+    }
+    
+    // Add a fresh event listener
+    newLogoutBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleLogout();
+    });
   }
   
   // Cancel reservation confirmation
@@ -594,4 +668,50 @@ async function handleModifyReservation(e) {
   
   // Reload reservations
   loadGuestReservations();
+}
+
+/**
+ * Display empty states for both upcoming and past reservations
+ * Used when there's an error loading data or no reservations found
+ */
+function displayEmptyStates() {
+  // Handle upcoming reservations container
+  const upcomingContainer = document.getElementById('upcomingReservations');
+  if (upcomingContainer) {
+    upcomingContainer.innerHTML = `
+      <div class="col-12 text-center py-5">
+        <div class="mb-4">
+          <i class="bi bi-calendar-x display-1 text-muted"></i>
+        </div>
+        <h4>No upcoming reservations found</h4>
+        <p class="text-muted mb-4">Find your next dinner experience!</p>
+        <a href="index.html#featured-dinners" class="btn btn-warning">Browse Dinners</a>
+      </div>
+    `;
+  }
+  
+  // Handle past reservations container
+  const pastContainer = document.getElementById('pastReservations');
+  if (pastContainer) {
+    pastContainer.innerHTML = `
+      <div class="col-12 text-center py-5">
+        <div class="mb-4">
+          <i class="bi bi-clock-history display-1 text-muted"></i>
+        </div>
+        <h4>No past reservations found</h4>
+        <p class="text-muted">Your dinner history will appear here</p>
+      </div>
+    `;
+  }
+  
+  // Update counters if they exist
+  const upcomingCount = document.getElementById('upcomingCount');
+  if (upcomingCount) {
+    upcomingCount.textContent = '0';
+  }
+  
+  const pastCount = document.getElementById('pastCount');
+  if (pastCount) {
+    pastCount.textContent = '0';
+  }
 }
