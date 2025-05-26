@@ -85,7 +85,7 @@ The project uses **Bootstrap's default font stack** with **system fonts** for op
 
 ### 📐 **Wireframes**  
 Detailed wireframes were created for **mobile, tablet, and desktop layouts**.  
-📌 **View Wireframes:** [Add wireframe images here]
+📌 **View Wireframes:** ![Hoem wireframe](assets/images/wireframe/wireframehome.png) ![](assets/images/wireframe/wireframehome2.png) ![](assets/images/wireframe/wireframehome3.png)
 
 ### 🖼️ **Imagery**  
 The platform integrates with **Unsplash API** for high-quality food photography and uses **custom hero images** to create an appetizing visual experience.
@@ -276,6 +276,10 @@ The following resources were used in the development of **Dinner Hosting Platfor
 - **HTML & CSS Validation**: [W3C Validator](https://validator.w3.org/) & [Jigsaw CSS Validator](https://jigsaw.w3.org/css-validator/)
 - **JavaScript Documentation**: [MDN Web Docs](https://developer.mozilla.org/)
 - **GitHub Hosting**: [GitHub Pages](https://pages.github.com/)
+
+### 🧩 Design Tools
+- **Wireframe**: [Figma](https://wireframe.cc/) for wireframing and UI design
+- **Canva**: [Canva](https://www.canva.com//) for image editing and design
 
 ### 🤖 AI Assistance
 - **GitHub Copilot**: [GitHub Copilot](https://github.com/features/copilot) for AI-powered coding assistance
