@@ -5,7 +5,15 @@ Dinner Hosting Platform is an interactive **community driven web application** w
 🔗 **Try the Platform Here:** [Home](https://repoeli.github.io/dinnerhost/) 
 
 
-![Home](assets/images/deviceresponsive/Home%20Cooked%20Meals.png)
+
+| 📱 **Mobile** | 📟 **Tablet** | 🖥️ **Desktop** |
+|:-------------:|:-------------:|:---------------:|
+|  |
+| **375px+** | **768px+** | **1200px+** |
+| Touch-optimized interface | Balanced layout | Full-featured experience |
+
+**📸 Platform Overview**  
+![Platform Overview - All Devices](assets/images/deviceresponsive/Home%20Cooked%20Meals.png)
 
 ## 📖 Table of Contents  
 - [📌 Project Overview](#-project-overview)  
@@ -81,6 +89,13 @@ Detailed wireframes were created for **mobile, tablet, and desktop layouts**.
 
 ### 🖼️ **Imagery**  
 The platform integrates with **Unsplash API** for high-quality food photography and uses **custom hero images** to create an appetizing visual experience.
+
+#### 📱 **Responsive Design Showcase**
+The platform is fully responsive and optimized for all device types:
+
+| 📱 **Mobile** | 📟 **Tablet** | 🖥️ **Desktop** |
+|:-------------:|:-------------:|:---------------:|
+| ![Mobile View](assets/images/deviceresponsive/mobile.png) | ![Tablet View](assets/images/deviceresponsive/tablet.png) | ![Desktop View](assets/images/deviceresponsive/desktop.png) |
 
 ---
 
