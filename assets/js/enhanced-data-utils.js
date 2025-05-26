@@ -39,8 +39,7 @@ class DataManager {  static saveData(key, data) {
     } catch (error) {
       return false;
     }
-  }
-  static saveAllGlobalData() {
+  }  static saveAllGlobalData() {
     try {
       // Save global arrays to localStorage
       if (typeof dinners !== 'undefined') this.saveData('dinners', dinners);

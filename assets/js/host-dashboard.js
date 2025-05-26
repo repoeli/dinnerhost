@@ -503,12 +503,19 @@ async function handleCreateDinner(e) {
     imageAttribution: {
       photographerName,
       photoUrl
-    }  };
-  
-  // Add to dinners array
+    }  };  // Add to dinners array
   dinners.push(newDinner);
-    // Save data to storage
-  DataManager.saveData();
+  
+  // Save to the newly created dinners localStorage key for persistence across page reloads
+  const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
+  newlyCreatedDinners.push(newDinner);
+  DataManager.saveData('newlyCreatedDinners', newlyCreatedDinners);
+  
+  // Explicitly save the dinners array to both specific keys for redundancy
+  DataManager.saveData('dinners', dinners);
+  
+  // Then save all global data (this provides an additional layer of saving)
+  DataManager.saveAllGlobalData();
   
   // Close modal
   ModalManager.hide('createDinnerModal');
@@ -608,10 +615,17 @@ function handleEditDinner(e) {
     imageAttribution: {
       photographerName,
       photoUrl    }
-  };
+  };  // Save data to storage - explicit two-step save for redundancy
+  DataManager.saveData('dinners', dinners);
+  DataManager.saveAllGlobalData();
   
-  // Save data to storage
-  DataManager.saveData();
+  // Update the newly created dinners in localStorage
+  const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
+  const newlyCreatedIndex = newlyCreatedDinners.findIndex(d => d.id.toString() === dinnerId.toString());
+  if (newlyCreatedIndex !== -1) {
+    newlyCreatedDinners[newlyCreatedIndex] = dinners[dinnerIndex];
+    DataManager.saveData('newlyCreatedDinners', newlyCreatedDinners);
+  }
   
   // Close modal
   ModalManager.hide('editDinnerModal');
@@ -653,16 +667,21 @@ function handleDeleteDinner() {
     showNotification('Dinner not found for deletion', 'error');
     return;
   }
-  
-  // Remove dinner
+    // Remove dinner
   dinners.splice(dinnerIndex, 1);
-    // Also remove associated reservations
+    
+  // Also remove associated reservations
   const updatedReservations = reservations.filter(r => r.dinnerId !== dinnerId);
   reservations.length = 0;
   reservations.push(...updatedReservations);
+  // Remove from newly created dinners in localStorage
+  const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
+  const filteredNewlyCreatedDinners = newlyCreatedDinners.filter(d => d.id.toString() !== dinnerId.toString());
+  DataManager.saveData('newlyCreatedDinners', filteredNewlyCreatedDinners);
   
-  // Save data to storage
-  DataManager.saveData();
+  // Explicit two-step save for redundancy
+  DataManager.saveData('dinners', dinners);
+  DataManager.saveAllGlobalData();
   
   // Close modal
   ModalManager.hide('deleteConfirmModal');

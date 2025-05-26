@@ -49,13 +49,13 @@ async function init() {
     checkUserLoginStatus();
 
     // Update UI based on user status
-    updateUIForUserStatus();
-
-    // Populate dinner listings and filters ONLY if on a page that needs them (e.g., index.html)
+    updateUIForUserStatus();    // Populate dinner listings and filters ONLY if on a page that needs them (e.g., index.html)
     // Check for a specific element unique to index.html's main content area
     if (document.getElementById('dinnerListingsContainer') || document.querySelector('.featured-dinners-section')) {
       if (typeof displayDinners === 'function') {
-        displayDinners(dinners);
+        // Only display upcoming dinners in Featured Dinners section
+        const upcomingDinners = getUpcomingDinners(dinners);
+        displayDinners(upcomingDinners);
       }
       if (typeof setupFilterListeners === 'function') setupFilterListeners();
       if (typeof updateFilterCounts === 'function') updateFilterCounts();
@@ -144,15 +144,24 @@ async function loadData() {
             "isPublic": true,
             "category": "italian",
             "createdAt": "2025-05-14T00:00:00.000Z"          }        ];
+      }      // First, check if there are already saved dinners in localStorage
+      const savedDinners = DataManager.loadData('dinners', []);
+      if (savedDinners && savedDinners.length > 0) {
+        // Use the saved dinners instead of the ones from JSON
+        dinners = savedDinners;
       }
-
-      // Load any newly created dinners from localStorage and merge them
+      
+      // Then load any newly created dinners from localStorage and merge them
       const newlyCreatedDinners = DataManager.loadData('newlyCreatedDinners', []);
       if (newlyCreatedDinners.length > 0) {
         // Merge new dinners with existing dinners (avoid duplicates by ID)
         newlyCreatedDinners.forEach(newDinner => {
-          const existingDinner = dinners.find(d => d.id === newDinner.id);
-          if (!existingDinner) {
+          const existingIndex = dinners.findIndex(d => d.id === newDinner.id);
+          if (existingIndex !== -1) {
+            // Update existing dinner with potentially newer data
+            dinners[existingIndex] = newDinner;
+          } else {
+            // Add new dinner
             dinners.push(newDinner);
           }
         });
@@ -563,25 +572,28 @@ function updateFilterCounts(dinnersToCount = dinners) {
   
   if (!allCountBadge || !dinnersToCount) return; // Not on the index page or badges not found
   
-  // Count for each filter
-  const allCount = dinnersToCount.length;
+  // If counting all dinners, filter to upcoming ones for Featured Dinners section
+  const upcomingDinners = dinnersToCount === dinners ? getUpcomingDinners(dinners) : dinnersToCount;
+  
+  // Count for each filter (all based on upcoming dinners)
+  const allCount = upcomingDinners.length;
   
   // Today's dinners (using today's date)
   const today = new Date().toISOString().split('T')[0];
-  const todayCount = dinnersToCount.filter(dinner => dinner.date === today).length;
+  const todayCount = upcomingDinners.filter(dinner => dinner.date === today).length;
   
   // This week's dinners
   const now = new Date();
   const nextWeek = new Date(now);
   nextWeek.setDate(now.getDate() + 7);
   
-  const weekCount = dinnersToCount.filter(dinner => {
+  const weekCount = upcomingDinners.filter(dinner => {
     const dinnerDate = new Date(`${dinner.date}T${dinner.time}`);
     return dinnerDate >= now && dinnerDate <= nextWeek;
   }).length;
   
   // Vegetarian dinners - check both category and description for compatibility
-  const vegetarianCount = dinnersToCount.filter(dinner => 
+  const vegetarianCount = upcomingDinners.filter(dinner => 
     dinner.category === 'vegan' || 
     dinner.category === 'vegetarian' || 
     dinner.tags?.includes('vegetarian') ||
@@ -590,7 +602,7 @@ function updateFilterCounts(dinnersToCount = dinners) {
   ).length;
   
   // Dinners under $20
-  const under20Count = dinnersToCount.filter(dinner => {
+  const under20Count = upcomingDinners.filter(dinner => {
     const price = dinner.price ? parseFloat(dinner.price) : 0;
     return price < 20;
   }).length;
@@ -889,11 +901,11 @@ function clearSearchAndReload() {
       if (p) {
         p.textContent = 'Discover unique dining experiences in your community';
       }
-    }
-  }
+    }  }
   
-  // Display all dinners (reset to page 1)
-  displayDinners(dinners, 1);
+  // Display only upcoming dinners (reset to page 1)
+  const upcomingDinners = getUpcomingDinners(dinners);
+  displayDinners(upcomingDinners, 1);
   
   // Reset filter buttons
   document.querySelectorAll('[id^="filter-"]').forEach(btn => {
@@ -949,13 +961,15 @@ function handleFilterClick(e) {
  * @returns {Array} Filtered array of dinner objects
  */
 function getFilteredDinners(filterType) {
-  let filteredDinners = [...dinners];
+  // Start with only upcoming dinners (future dates)
+  const upcomingDinners = getUpcomingDinners(dinners);
+  let filteredDinners = [...upcomingDinners];
   
-  // Apply filtering
+  // Apply filtering to upcoming dinners only
   switch (filterType) {
     case 'today':
       const today = new Date().toISOString().split('T')[0];
-      filteredDinners = dinners.filter(dinner => dinner.date === today);
+      filteredDinners = upcomingDinners.filter(dinner => dinner.date === today);
       break;
       
     case 'this-week':
@@ -963,14 +977,14 @@ function getFilteredDinners(filterType) {
       const nextWeek = new Date(now);
       nextWeek.setDate(now.getDate() + 7);
       
-      filteredDinners = dinners.filter(dinner => {
+      filteredDinners = upcomingDinners.filter(dinner => {
         const dinnerDate = new Date(`${dinner.date}T${dinner.time}`);
         return dinnerDate >= now && dinnerDate <= nextWeek;
       });
       break;
       
     case 'vegetarian':
-      filteredDinners = dinners.filter(dinner => 
+      filteredDinners = upcomingDinners.filter(dinner => 
         dinner.category === 'vegan' || 
         dinner.category === 'vegetarian' || 
         dinner.description.toLowerCase().includes('vegan') || 
@@ -979,12 +993,13 @@ function getFilteredDinners(filterType) {
       break;
       
     case 'under-20':
-      filteredDinners = dinners.filter(dinner => dinner.price < 20);
+      filteredDinners = upcomingDinners.filter(dinner => dinner.price < 20);
       break;
       
     case 'all':
     default:
-      // No filtering needed
+      // Show all upcoming dinners
+      filteredDinners = upcomingDinners;
       break;
   }
   
@@ -1085,12 +1100,12 @@ async function handleCreateDinner(e) {
   
   // Close modal
   ModalManager.hide('createDinnerModal');
-  
-  // Show notification
+    // Show notification
   showNotification('Your dinner has been created successfully!', 'success');
   
-  // Update dinner listings
-  displayDinners(dinners);
+  // Update dinner listings - only show upcoming dinners in Featured Dinners section
+  const upcomingDinners = getUpcomingDinners(dinners);
+  displayDinners(upcomingDinners);
   
   // Update filter badge counts
   updateFilterCounts();
