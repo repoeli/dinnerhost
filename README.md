@@ -146,6 +146,8 @@ The platform integrates with **Unsplash API** for high-quality food photography 
 - ✅ **Cross-Browser Testing** – Compatible with Chrome, Firefox, Safari, and Edge.  
 - ✅ **Touch Interface** – Optimized for touch interactions on mobile devices.  
 
+![Google Dev Tools Testing Results](assets/images/googleDvTools/googleDevTools.jpg)
+
 ### 🔧 **Functional Testing**
 - ✅ **API Integration** – Unsplash image search working via secure proxy.  
 - ✅ **Data Persistence** – Local storage for reservations and user data.  
