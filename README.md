@@ -1,9 +1,11 @@
 # 🍽️ Dinner Hosting Platform 🏠
-Dinner Hosting Platform is an interactive **community-driven web application** where passionate home cooks can host intimate dinner parties and food lovers can discover authentic culinary experiences. It was developed by:  
-  👨🏽‍💻**[Your Name]**  
+Dinner Hosting Platform is an interactive **community driven web application** where passionate home cooks can host intimate dinner parties and food lovers can discover authentic culinary experiences. 
 
 ### **Live Demo**  
-🔗 **Try the Platform Here:** [Add your live demo link here]  
+🔗 **Try the Platform Here:** [Home](https://repoeli.github.io/dinnerhost/) 
+
+
+![Home](assets/images/deviceresponsive/Home%20Cooked%20Meals.png)
 
 ## 📖 Table of Contents  
 - [📌 Project Overview](#-project-overview)  
