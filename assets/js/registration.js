@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Setup password validation for the registration form
+ * Sets up password validation for the registration form
+ * Adds event listeners to both password fields to check for matching values
  */
 function setupPasswordValidation() {
   const registerPassword = document.getElementById('registerPassword');
@@ -48,7 +49,10 @@ function setupPasswordValidation() {
 }
 
 /**
- * Validate that passwords match in real-time
+ * Validates that password and confirm password fields match
+ * Uses HTML5 constraint validation API to show validation errors
+ * @param {HTMLInputElement} password - The password input element
+ * @param {HTMLInputElement} confirmPassword - The confirm password input element
  */
 function validatePasswordMatch(password, confirmPassword) {
   if (password.value !== confirmPassword.value) {

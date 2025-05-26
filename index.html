@@ -642,11 +642,12 @@
       document.head.appendChild(link);
     });
   </script>
-    <!-- Essential scripts loaded with priority -->
+  <!-- Essential scripts loaded with priority -->
   <script src="assets/js/api-config.js" defer></script>
   <script src="assets/js/enhanced-data-utils.js" defer></script>
   <script src="assets/js/script.js" defer></script>
-  <script src="assets/js/login-fix.js" defer></script>
+  <!-- login-fix.js is commented out as its functionality has been integrated into script.js to reduce HTTP requests -->
+  <!--<script src="assets/js/login-fix.js" defer></script> -->
   <script src="assets/js/heroAnimations.js" defer></script>
   
   <!-- Non-critical scripts loaded with lower priority -->
@@ -654,11 +655,15 @@
   <script src="assets/js/handleHeroSearch.js" defer></script>
   <script src="assets/js/registration.js" defer></script>
   <script src="assets/js/dropdown-fix.js" defer></script>
+  <!-- logout-util.js is commented out as its core functionality has been integrated into script.js to reduce HTTP requests -->
   <!--<script src="assets/js/logout-util.js" defer></script> -->
-  
-  <!-- Optional animation script loaded last -->
+    <!-- Optional animation script loaded last -->
   <script src="assets/js/fireAnimation.js" defer></script>
-    <!-- Host login test script -->
+  
+  <!-- Host login test script - Used for automated testing of host login functionality 
+       This script detects if we're coming from a host login test, retrieves test credentials 
+       from sessionStorage, and automatically fills and submits the login form.
+       The test=host-login URL parameter triggers this behavior. -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Check if we're coming from the host login test
@@ -669,23 +674,21 @@
         const testPassword = sessionStorage.getItem('testLoginPassword');
         
         if (testEmail && testPassword) {
-          console.log("Host login test detected. Using credentials:", testEmail);
-          
-          // Clear the test credentials
+          // Clear the test credentials from sessionStorage to avoid repeated login attempts
           sessionStorage.removeItem('testLoginEmail');
           sessionStorage.removeItem('testLoginPassword');
           
-          // Wait for the page to fully load
+          // Wait for the page to fully load before attempting login
           setTimeout(() => {
-            // Open the login modal
+            // Open the login modal using the ModalManager utility if available
             if (typeof ModalManager !== 'undefined' && ModalManager.show) {
               ModalManager.show('loginModal');
               
-              // Fill in the login form
+              // Fill in the login form with test credentials
               document.getElementById('loginEmail').value = testEmail;
               document.getElementById('loginPassword').value = testPassword;
               
-              // Submit the form
+              // Submit the form programmatically
               const loginForm = document.getElementById('loginForm');
               if (loginForm) {
                 // Create and dispatch a submit event

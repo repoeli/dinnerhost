@@ -253,11 +253,9 @@ function setupEventListeners() {  // Check if we're on the host dashboard page (
       if (logoutBtn.parentNode) {
         logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
       }
-      
-      newLogoutBtn.addEventListener('click', function(e) {
+        newLogoutBtn.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Logout clicked in script.js');
         
         // Use the global performLogout if available
         if (typeof window.performLogout === 'function') {
@@ -342,11 +340,9 @@ function updateUIForUserStatus() {
   
   // Get user from localStorage if not in global variable
   if (!currentUser) {
-    try {
-      const userStr = localStorage.getItem('currentUser');
+    try {      const userStr = localStorage.getItem('currentUser');
       if (userStr) {
         currentUser = JSON.parse(userStr);
-        console.log("Updated currentUser from localStorage:", currentUser.email);
       }
     } catch (e) {
       console.error("Error parsing currentUser:", e);
@@ -358,10 +354,8 @@ function updateUIForUserStatus() {
   const hostButtons = document.querySelectorAll('.host-only');
   const userNameElements = document.querySelectorAll('.user-name');
   const loginBtn = document.getElementById('loginBtn');
-  
-  if (currentUser) {
+    if (currentUser) {
     // User is logged in
-    console.log("Updating UI for logged in user:", currentUser.email, "Type:", currentUser.type);
     authButtons.forEach(el => el.classList.remove('d-none'));
     
     // Show/hide elements based on user type

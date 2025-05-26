@@ -9,7 +9,11 @@
   
   // Cache DOM elements for better performance
   let cachedElements = {};
-  
+    /**
+   * Retrieves cached DOM elements or fetches them once
+   * @param {string} id - ID of the element to retrieve
+   * @returns {HTMLElement|null} - The cached DOM element or null
+   */
   function getCachedElement(id) {
     if (!cachedElements[id]) {
       cachedElements[id] = document.getElementById(id);
@@ -17,7 +21,10 @@
     return cachedElements[id];
   }
   
-  // Setup explore dinners button immediately when DOM is ready
+  /**
+   * Sets up the "Explore Dinners" button click handler
+   * Smoothly scrolls to featured dinners section and focuses search
+   */
   function setupExploreDinnersButton() {
     const exploreBtn = getCachedElement('exploreDinnersBtn');
     if (!exploreBtn) return;
@@ -49,8 +56,10 @@
       }
     }, { passive: false });
   }
-  
-  // Setup search focus effects with performance optimization
+    /**
+   * Sets up focus and blur effects for the search input
+   * Adds/removes classes for visual feedback using requestAnimationFrame
+   */
   function setupSearchFocusEffects() {
     const searchInput = getCachedElement('heroSearch');
     const searchContainer = document.querySelector('.dinner-search-container');
@@ -70,8 +79,11 @@
       });
     }, { passive: true });
   }
-  
-  // Optimized lazy loading with reduced overhead
+    /**
+   * Implements lazy loading for non-critical sections
+   * Uses IntersectionObserver for efficient loading when sections come into view
+   * Includes fallback for browsers without IntersectionObserver support
+   */
   function lazyLoadNonCriticalSections() {
     // Check for Intersection Observer support
     if (!('IntersectionObserver' in window)) {
@@ -104,8 +116,10 @@
       sectionObserver.observe(section);
     });
   }
-  
-  // Prevent layout shifts by ensuring hero content is stable
+    /**
+   * Prevents layout shifts in the hero section
+   * Sets CSS properties to maintain stability during page load
+   */
   function stabilizeHeroLayout() {
     const hero = document.querySelector('.hero');
     const heroContent = document.querySelector('.hero-content');
@@ -120,7 +134,10 @@
     }
   }
   
-  // Initialize everything when DOM is ready
+  /**
+   * Initializes all hero animations and optimizations
+   * Sets up event listeners and triggers initial functions
+   */
   function init() {
     setupExploreDinnersButton();
     setupSearchFocusEffects();

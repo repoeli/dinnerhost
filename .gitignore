@@ -98,7 +98,8 @@ validation-*.*
 *test*
 *optimized.jpg
 *validate*
-
+CODE_CLEANUP_README.md
+CODE_DOCUMENTATION.js
 *verify*
 
 # Build files

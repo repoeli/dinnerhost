@@ -1,12 +1,22 @@
 /**
  * Dropdown Fix - Handles dropdown menu issues and interactions
  * Part of the dinner hosting website performance optimization
+ * 
+ * This module addresses various dropdown menu issues and provides enhanced functionality:
+ * - Ensures dropdowns work correctly across different browsers and devices
+ * - Adds keyboard navigation for accessibility
+ * - Improves positioning to prevent overflow issues
+ * - Implements special handling for mobile devices
+ * - Provides workarounds for Bootstrap dropdown edge cases
  */
 
 (function() {
     'use strict';
 
-    // Wait for DOM to be ready
+    /**
+     * Wait for DOM to be ready before initializing
+     * @param {Function} fn - Function to execute when DOM is ready
+     */
     function ready(fn) {
         if (document.readyState !== 'loading') {
             fn();
@@ -15,33 +25,34 @@
         }
     }
 
-    // Initialize dropdown fixes
+    // Initialize dropdown fixes when DOM is ready
     ready(function() {
         initializeDropdownFixes();
     });
 
+    /**
+     * Main initialization function that calls all individual dropdown fixes
+     * This is the entry point for all dropdown enhancement functionality
+     */
     function initializeDropdownFixes() {
         fixDropdownToggle();
         fixDropdownOutsideClick();
         fixDropdownKeyboard();
         fixDropdownPositioning();
         fixMobileDropdowns();
-    }    // Fix dropdown toggle behavior
+    }// Fix dropdown toggle behavior
     function fixDropdownToggle() {
         // Specifically target the user dropdown to avoid conflicts with other dropdowns
         const userDropdown = document.querySelector('#userDropdown');
         
         if (userDropdown) {
             // First try to use Bootstrap's API
-            if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
-                try {
-                    let dropdownInstance = bootstrap.Dropdown.getInstance(userDropdown);
+            if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {                try {                    let dropdownInstance = bootstrap.Dropdown.getInstance(userDropdown);
                     if (!dropdownInstance) {
                         dropdownInstance = new bootstrap.Dropdown(userDropdown);
-                        console.log('User dropdown initialized with Bootstrap API');
                     }
                 } catch (error) {
-                    console.error('Error initializing dropdown with Bootstrap:', error);
+                    // Continue with fallback approach
                 }
             }
             
@@ -244,23 +255,19 @@
     }    // Handle dropdown actions
     function handleDropdownAction(action, item) {
         switch (action) {
-            case 'logout':
-                if (typeof window.confirmLogout === 'function') {
+            case 'logout':                if (typeof window.confirmLogout === 'function') {
                     window.confirmLogout();
                 } else if (window.LogoutUtil && window.LogoutUtil.confirmLogout) {
                     window.LogoutUtil.confirmLogout();
-                } else {
-                    console.log('Logout action triggered but no logout handler found');
                 }
-                break;
-            case 'profile':
+                break;            case 'profile':
                 showProfile();
                 break;
             case 'settings':
                 showSettings();
                 break;
             default:
-                console.log('Unknown dropdown action:', action);
+                // No action needed for unknown actions
         }
         
         // Close dropdown after action
@@ -269,13 +276,11 @@
 
     // Handle logout action    // Show profile (placeholder)
     function showProfile() {
-        console.log('Profile action triggered');
         // Implement profile functionality
     }
 
     // Show settings (placeholder)
     function showSettings() {
-        console.log('Settings action triggered');
         // Implement settings functionality
     }
 

@@ -1,7 +1,47 @@
 /**
  * Handle hero search input
- * This searches through available dinners based on user input
- * directly in the featured dinners section
+ * Searches through available dinners based on user input
+ * and updates the featured dinners section with results
+ * Includes loading animations and notifications for search status
+ */
+/**
+ * Handles the hero search functionality for filtering dinner events based on user input.
+ * 
+ * This function performs a comprehensive search across multiple dinner properties including
+ * title, description, cuisine type, location, host name, category, and date. It includes
+ * robust error handling, loading states, visual feedback, and maintains search history.
+ * 
+ * The function validates all dependencies before proceeding and gracefully handles missing
+ * functions or data. It filters only upcoming dinners and provides user feedback through
+ * notifications and visual effects.
+ * 
+ * Key Features:
+ * - Validates search input and required dependencies (dinners array, display functions)
+ * - Searches across multiple dinner properties with case-insensitive matching
+ * - Maintains recent search history via saveRecentSearch()
+ * - Provides loading states with spinner and section highlighting
+ * - Updates filter counts and UI states after search completion
+ * - Shows appropriate notifications for search results or errors
+ * - Handles empty search terms by displaying all upcoming dinners with shake animation
+ * - Includes comprehensive error handling with proper cleanup
+ * 
+ * Dependencies:
+ * - Global dinners array containing dinner event data
+ * - displayDinners() function for rendering filtered results
+ * - getUpcomingDinners() function for filtering future events
+ * - showNotification() function for user feedback
+ * - saveRecentSearch() function for search history
+ * - updateFilterCounts() or updateSearchFilterCounts() for UI updates
+ * 
+ * DOM Elements:
+ * - #heroSearch: Main search input field
+ * - #heroSearchBtn: Search button with loading states
+ * - #featured-dinners: Section container for visual effects
+ * - .dinner-search-container: Container for shake animation
+ * - Filter buttons with IDs starting with 'filter-'
+ * 
+ * @throws {Error} Catches and handles any errors during search execution
+ * @returns {void} No return value - performs DOM manipulation and UI updates
  */
 function handleHeroSearch() {
   const searchInput = document.getElementById('heroSearch');
@@ -9,7 +49,7 @@ function handleHeroSearch() {
     return;
   }
   
-  const searchTerm = searchInput.value.trim().toLowerCase();  // Check if dinners array is available
+  const searchTerm = searchInput.value.trim().toLowerCase();// Check if dinners array is available
   if (typeof dinners === 'undefined') {
     if (typeof showNotification === 'function') {
       showNotification('Search data not loaded yet. Please wait a moment and try again.', 'error');

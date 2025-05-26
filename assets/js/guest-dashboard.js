@@ -78,8 +78,6 @@ function checkUserLoginStatus() {
  * Uses the enhanced logout utility for proper UI refresh and redirection
  */
 function handleLogout() {
-  console.log('Logout function called in guest-dashboard.js');
-  
   // Use the confirmLogout function from logout-util.js
   if (typeof window.confirmLogout === 'function') {
     window.confirmLogout();

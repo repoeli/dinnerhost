@@ -24,6 +24,10 @@ const apiConfig = {
 };
 
 // Initialize tooltips if Bootstrap is available
+/**
+ * Initializes Bootstrap tooltips when DOM is fully loaded
+ * Sets up tooltips for all elements with data-bs-toggle="tooltip" attribute
+ */
 document.addEventListener('DOMContentLoaded', function() {
   if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

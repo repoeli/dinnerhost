@@ -5,8 +5,10 @@
 
 (function() {
   'use strict';
-  
-  // Prevent layout shifts by setting stable dimensions
+    /**
+   * Prevents Cumulative Layout Shifts (CLS) by setting stable dimensions
+   * for key page elements before content loads
+   */
   function preventLayoutShifts() {
     // Set stable hero dimensions
     const hero = document.querySelector('.hero');
@@ -22,8 +24,11 @@
       navbar.style.minHeight = '76px';
     }
   }
-  
-  // Optimize image loading to prevent CLS
+    /**
+   * Optimizes image loading to improve Largest Contentful Paint (LCP)
+   * Sets dimensions immediately and implements a smooth fade-in effect
+   * when images are loaded
+   */
   function optimizeImageLoading() {
     const heroImg = document.querySelector('.hero-background-img');
     if (heroImg) {
@@ -49,8 +54,11 @@
       }
     }
   }
-  
-  // Lazy load non-critical CSS
+    /**
+   * Lazily loads non-critical CSS resources to improve initial page load
+   * Uses the print media query trick to load CSS asynchronously without
+   * blocking the page render
+   */
   function loadNonCriticalCSS() {
     const stylesheets = [
       'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css'
@@ -67,8 +75,10 @@
       document.head.appendChild(link);
     });
   }
-  
-  // Optimize font loading
+    /**
+   * Optimizes font loading using the font-display: swap property
+   * Prevents invisible text during font loading by using system fonts first
+   */
   function optimizeFontLoading() {
     // Preload system fonts for better performance
     const style = document.createElement('style');
@@ -80,8 +90,11 @@
     `;
     document.head.appendChild(style);
   }
-  
-  // Initialize optimizations
+    /**
+   * Initializes all performance optimizations
+   * Calls critical optimizations immediately and defers non-critical ones
+   * using requestIdleCallback when available
+   */
   function init() {
     preventLayoutShifts();
     optimizeImageLoading();

@@ -4,6 +4,10 @@
  */
 
 class ModalManager {
+  /**
+   * Shows a Bootstrap modal by ID
+   * @param {string} modalId - ID of the modal to show
+   */
   static show(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -12,6 +16,10 @@ class ModalManager {
     }
   }
 
+  /**
+   * Hides a Bootstrap modal by ID
+   * @param {string} modalId - ID of the modal to hide
+   */
   static hide(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -22,11 +30,21 @@ class ModalManager {
     }
   }
 
+  /**
+   * Switches from one modal to another with a delay
+   * @param {string} fromModalId - ID of the modal to hide
+   * @param {string} toModalId - ID of the modal to show
+   */
   static switch(fromModalId, toModalId) {
     this.hide(fromModalId);
     setTimeout(() => this.show(toModalId), 300);
   }
 
+  /**
+   * Shows a modal with custom content in the modal body
+   * @param {string} modalId - ID of the modal to show
+   * @param {string} content - HTML content to set in the modal body
+   */
   static showWithContent(modalId, content) {
     const modal = document.getElementById(modalId);
     if (modal && content) {
@@ -40,6 +58,10 @@ class ModalManager {
 }
 
 class FormUtils {
+  /**
+   * Resets a form to its initial state
+   * @param {string} formId - ID of the form to reset
+   */
   static resetForm(formId) {
     const form = document.getElementById(formId);
     if (form) {
@@ -47,6 +69,11 @@ class FormUtils {
     }
   }
 
+  /**
+   * Gets form data from a form element
+   * @param {string} formId - ID of the form
+   * @returns {FormData|null} - FormData object or null if form not found
+   */
   static getFormData(formId) {
     const form = document.getElementById(formId);
     if (form) {
@@ -55,6 +82,11 @@ class FormUtils {
     return null;
   }
 
+  /**
+   * Validates a form using built-in HTML5 validation
+   * @param {string} formId - ID of the form to validate
+   * @returns {boolean} - True if form is valid, false otherwise
+   */
   static validateForm(formId) {
     const form = document.getElementById(formId);
     if (form) {
@@ -65,6 +97,11 @@ class FormUtils {
 }
 
 class ButtonUtils {
+  /**
+   * Sets a button to loading state or reverts it back to normal
+   * @param {string} buttonId - ID of the button
+   * @param {boolean} [isLoading=true] - Whether to show loading state
+   */
   static setLoading(buttonId, isLoading = true) {
     const button = document.getElementById(buttonId);
     if (button) {
@@ -83,6 +120,11 @@ class ButtonUtils {
     }
   }
 
+  /**
+   * Sets the text content of a button
+   * @param {string} buttonId - ID of the button
+   * @param {string} text - New text to set
+   */
   static setText(buttonId, text) {
     const button = document.getElementById(buttonId);
     if (button) {
@@ -92,6 +134,11 @@ class ButtonUtils {
 }
 
 class NotificationUtils {
+  /**
+   * Shows a notification toast message
+   * @param {string} message - Message to display in the notification
+   * @param {string} [type='success'] - Type of notification: 'success', 'error', 'warning', or 'info'
+   */
   static showNotification(message, type = 'success') {
     // Remove any existing notifications
     const existingNotification = document.querySelector('.notification-toast');
@@ -118,7 +165,11 @@ class NotificationUtils {
       }
     }, 5000);
   }
-
+  /**
+   * Maps notification type to Bootstrap alert class
+   * @param {string} type - Notification type: 'success', 'error', 'warning', or 'info'
+   * @returns {string} - Corresponding Bootstrap alert class
+   */
   static getNotificationClass(type) {
     const typeMap = {
       'success': 'success',
@@ -131,6 +182,10 @@ class NotificationUtils {
 }
 
 class ImageUtils {
+  /**
+   * Sets up image selection functionality for a container
+   * @param {string} containerId - ID of the container with image options
+   */
   static setupImageSelection(containerId) {
     const container = document.getElementById(containerId);
     if (container) {
@@ -138,6 +193,10 @@ class ImageUtils {
     }
   }
 
+  /**
+   * Sets up click handlers for image selection within a container
+   * @param {string} containerId - ID of the container with image options
+   */
   static setupImageSelectionForContainer(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -185,6 +244,11 @@ class ImageUtils {
 }
 
 // Global utility functions for backward compatibility
+/**
+ * Shows a notification toast message (global function for backward compatibility)
+ * @param {string} message - Message to display in the notification
+ * @param {string} [type='success'] - Type of notification: 'success', 'error', 'warning', or 'info'
+ */
 function showNotification(message, type = 'success') {
   NotificationUtils.showNotification(message, type);
 }

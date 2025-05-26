@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {  // Check if Bootstrap is 
 // ===== INITIALIZATION =====
 /**
  * Initialize the host dashboard page
+ * Loads necessary data, verifies user authentication and authorization,
+ * and sets up the dashboard UI and event listeners
  */
 async function initHostDashboard() {
   try {
@@ -43,27 +45,20 @@ async function initHostDashboard() {
       // Sync with global variable if found
       if (hostUser) {
         currentUser = hostUser;
-        console.log("Synchronized user from LoginFix:", hostUser.email);
       }
     }
-    
-    // Check if user is logged in
+      // Check if user is logged in
     if (!hostUser) {
-      console.log("No user is logged in, redirecting to index.html");
       // Redirect to login if not logged in
       window.location.href = 'index.html';
       return;
     }
-    
-    // Check if user is a host
+      // Check if user is a host
     if (hostUser.type !== 'host') {
-      console.log("User is not a host, redirecting to guest dashboard. User type:", hostUser.type);
       // Redirect to guest dashboard if not a host
       window.location.href = 'guest-dashboard.html';
       return;
     }
-    
-    console.log("Host user authenticated:", hostUser.name, "Email:", hostUser.email);
       // Set user name in navbar
     const navUsername = document.getElementById('navUsername');
     if (navUsername) {
@@ -87,6 +82,9 @@ async function initHostDashboard() {
 // ===== DATA LOADING =====
 /**
  * Load the host's dinners
+ * Filters the global dinners array to find dinners created by the current host
+ * and then displays them in the dashboard table
+ * @returns {Array} - Array of dinner objects for the current host
  */
 async function loadHostDinners() {
   // In a real app, we'd fetch this from an API with the host's ID
@@ -103,6 +101,9 @@ async function loadHostDinners() {
 
 /**
  * Display dinners in the table
+ * Renders the host's dinners in a table format with status indicators,
+ * guest counts, and action buttons for each dinner
+ * @param {Array} hostDinners - Array of dinner objects to display
  */
 function displayDinnersTable(hostDinners) {
   const tableBody = document.getElementById('dinnerTableBody');
@@ -782,6 +783,35 @@ function handleExportGuestsList() {
 /**
  * Handle image search for dinner creation/editing
  */
+/**
+ * Handles image search functionality for dinner events using Unsplash API via proxy.
+ * Supports both create and edit modes, fetches landscape-oriented food images,
+ * and provides fallback demo images if the API request fails.
+ * 
+ * @param {boolean} [isEdit=false] - Whether this is for editing an existing dinner (true) or creating new (false).
+ *                                   Determines which DOM elements to target for input and results.
+ * 
+ * @description
+ * - Validates search input and displays loading spinner during fetch
+ * - Uses configurable proxy endpoint with 10-second timeout for API requests
+ * - Fetches 6 landscape-oriented images per search with photographer attribution
+ * - Falls back to demo images if API fails (common with free Heroku apps)
+ * - Sets up click handlers for image selection via ImageUtils
+ * - Displays appropriate error messages and notifications to user
+ * 
+ * @example
+ * // Search for images in create mode
+ * handleImageSearch();
+ * 
+ * // Search for images in edit mode
+ * handleImageSearch(true);
+ * 
+ * @requires showNotification - Global function for displaying user notifications
+ * @requires ImageUtils.setupImageSelectionForContainer - Utility for handling image selection
+ * @requires apiConfig - Optional global config object with Unsplash endpoint settings
+ * 
+ * @throws {Error} Handles fetch timeouts and API errors gracefully with fallback content
+ */
 function handleImageSearch(isEdit = false) {
   // Clear any conflicting event listeners or issues by getting fresh references
   const searchTermInput = isEdit ? 'editDinnerImageSearch' : 'dinnerImageSearch';
@@ -805,15 +835,12 @@ function handleImageSearch(isEdit = false) {
     return;
   }  // Clear previous results
   resultsContainer.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-warning" role="status"></div><div class="mt-2">Searching for images...</div></div>';
-  
-  // Use proxy endpoint to fetch images
+    // Use proxy endpoint to fetch images
   const proxyEndpoint = typeof apiConfig !== 'undefined' && apiConfig.unsplash && apiConfig.unsplash.endpoint 
     ? apiConfig.unsplash.endpoint 
     : 'https://unsplash-proxy-app-fb6c8f079fb7.herokuapp.com/search';
   
   const endpoint = `${proxyEndpoint}?q=${encodeURIComponent(searchTerm)}&per_page=6&orientation=landscape`;
-  
-  console.log('Fetching images from:', endpoint); // Debug log
   
   // Add timeout to the fetch request
   const fetchWithTimeout = (url, options, timeout = 10000) => {
@@ -824,11 +851,9 @@ function handleImageSearch(isEdit = false) {
       )
     ]);
   };
-  
-  // Fetch images from proxy endpoint (no API key needed)
+    // Fetch images from proxy endpoint (no API key needed)
   fetchWithTimeout(endpoint)
   .then(response => {
-    console.log('Response status:', response.status); // Debug log
     if (!response.ok) {
       throw new Error(`Proxy API responded with status: ${response.status}`);
     }
@@ -857,9 +882,6 @@ function handleImageSearch(isEdit = false) {
     });      // Add click event to select images
     ImageUtils.setupImageSelectionForContainer(resultsContainerId);
   })  .catch(error => {
-    console.error('Error fetching images from proxy:', error);
-    console.log('Full error details:', error.message); // Debug log
-    
     const resultsContainer = document.getElementById(resultsContainerId);
     
     // Try to provide fallback demo images for development
@@ -917,17 +939,14 @@ function handleImageSearch(isEdit = false) {
  * Uses the enhanced logout utility for proper UI refresh and redirection
  */
 function handleLogout() {
-  console.log('Logout function called in host-dashboard.js');
-  
   // Use the confirmLogout function from logout-util.js
   if (typeof window.confirmLogout === 'function') {
     window.confirmLogout();
     return;
   }
-  
-  // Fallback to performLogout if confirm isn't available
-  if (typeof window.performLogout === 'function') {
-    window.performLogout();
+  // Fallback to performAutoLogout if confirm isn't available
+  if (typeof window.performAutoLogout === 'function') {
+    window.performAutoLogout();
     return;
   }
   
