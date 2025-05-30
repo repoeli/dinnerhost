@@ -45,6 +45,9 @@
   --modal-bg: #1e1e1e;
   --box-shadow: 0 0.125rem 0.25rem rgba(255, 255, 255, 0.05);
   --box-shadow-lg: 0 0.5rem 1rem rgba(255, 255, 255, 0.1);
+  --text-muted: #adb5bd; /* Enhanced muted text for better contrast in dark mode */
+  --secondary-bg: #2c2c2c; /* Background for secondary elements */
+  --secondary-text: #e0e0e0; /* Text color for secondary elements */
 }
 
 body {
@@ -705,70 +708,130 @@ nav h1 {
   border-color: var(--border-color);
 }
 
-[data-theme="dark"] .form-control:focus,
-[data-theme="dark"] .form-select:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 0.25rem rgba(253, 126, 20, 0.25);
+/* Improved contrast for section headers and descriptions in dark mode */
+[data-theme="dark"] .section-header h2 {
+  color: var(--text-light);
 }
 
+[data-theme="dark"] .section-header p {
+  color: var(--text-muted);
+}
+
+/* Improved visibility for list groups in dark mode */
+[data-theme="dark"] .list-group-item {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--secondary-text);
+}
+
+[data-theme="dark"] .list-group-item-action:hover,
+[data-theme="dark"] .list-group-item-action:focus {
+  background-color: var(--secondary-bg);
+  color: var(--text-light);
+}
+
+/* Input group enhancements for dark mode */
+[data-theme="dark"] .input-group-text {
+  background-color: var(--secondary-bg);
+  border-color: var(--border-color);
+  color: var(--secondary-text);
+}
+
+/* Stats section enhancements for dark mode */
+[data-theme="dark"] .stats-box {
+  background-color: var(--card-bg);
+}
+
+[data-theme="dark"] .stats-number {
+  color: var(--text-light);
+}
+
+[data-theme="dark"] .stats-label {
+  color: var(--text-muted);
+}
+
+/* Improved contrast for dropdown menus in dark mode */
 [data-theme="dark"] .dropdown-menu {
   background-color: var(--card-bg);
   border-color: var(--border-color);
+  box-shadow: 0 0.5rem 1rem rgba(255, 255, 255, 0.1);
 }
 
 [data-theme="dark"] .dropdown-item {
-  color: var(--text-dark);
+  color: var(--secondary-text);
 }
 
 [data-theme="dark"] .dropdown-item:hover,
 [data-theme="dark"] .dropdown-item:focus {
-  background-color: rgba(253, 126, 20, 0.1);
+  background-color: rgba(253, 126, 20, 0.2);
   color: var(--primary-color);
 }
 
-[data-theme="dark"] .modal-content {
-  background-color: var(--modal-bg);
-  color: var(--text-dark);
-  border-color: var(--border-color);
+/* Improved contrast for filter buttons in dark mode */
+[data-theme="dark"] .btn-outline-secondary {
+  color: var(--secondary-text);
+  border-color: #6c757d;
 }
 
-[data-theme="dark"] .modal-header,
-[data-theme="dark"] .modal-footer {
-  border-color: var(--border-color);
+[data-theme="dark"] .btn-outline-secondary:hover,
+[data-theme="dark"] .btn-outline-secondary:focus {
+  background-color: rgba(108, 117, 125, 0.2);
+  color: var(--text-light);
+  border-color: #6c757d;
 }
 
-[data-theme="dark"] .close {
-  color: var(--text-dark);
+[data-theme="dark"] .btn-outline-secondary.active {
+  background-color: #6c757d;
+  color: var(--text-light);
 }
 
-[data-theme="dark"] .btn-outline-warning {
-  color: var(--primary-color);
+/* Improved contrast for badges in dark mode */
+[data-theme="dark"] .badge.bg-secondary {
+  background-color: #6c757d !important;
+  color: var(--text-light);
 }
 
-[data-theme="dark"] .btn-outline-warning:hover {
-  color: #000;
+/* Improved contrast for text-muted in dark mode */
+[data-theme="dark"] .text-muted {
+  color: var(--text-muted) !important;
 }
 
-[data-theme="dark"] .list-group-item {
+/* Improved contrast for text-secondary in dark mode */
+[data-theme="dark"] .text-secondary {
+  color: var(--text-muted) !important;
+}
+
+/* Improved contrast for filter container in dark mode */
+[data-theme="dark"] .filter-container {
   background-color: var(--card-bg);
   border-color: var(--border-color);
-  color: var(--text-dark);
 }
 
-[data-theme="dark"] .table {
-  color: var(--text-dark);
+/* Improved contrast for table in dark mode */
+[data-theme="dark"] .table-light,
+[data-theme="dark"] .table-light > th,
+[data-theme="dark"] .table-light > td {
+  background-color: var(--secondary-bg);
+  color: var(--secondary-text);
 }
 
-[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
-  color: var(--text-dark);
-  background-color: rgba(255, 255, 255, 0.05);
+/* Improved contrast for form elements in dark mode */
+[data-theme="dark"] .form-check-input {
+  background-color: var(--secondary-bg);
+  border-color: var(--border-color);
 }
 
-[data-theme="dark"] .hero-overlay {
-  background: linear-gradient(145deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0.4) 100%);
+[data-theme="dark"] .form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
-/* Ensure all text elements use theme color */
+[data-theme="dark"] .bg-light {
+  background-color: var(--secondary-bg) !important;
+  color: var(--secondary-text);
+}
+
+/* Ensure all text elements use appropriate theme color */
 [data-theme="dark"] h1,
 [data-theme="dark"] h2,
 [data-theme="dark"] h3,
@@ -1641,4 +1704,36 @@ footer .newsletter-section {
     height: 28px;
     font-size: 1rem;
   }
+}
+
+/* Filter buttons specific enhancements for dark mode */
+[data-theme="dark"] [id^="filter-"] {
+  border-color: #6c757d;
+  color: var(--secondary-text);
+  position: relative;
+  z-index: 1;
+}
+
+[data-theme="dark"] [id^="filter-"]:hover,
+[data-theme="dark"] [id^="filter-"]:focus {
+  background-color: rgba(108, 117, 125, 0.2);
+  border-color: #adb5bd;
+  color: var(--text-light);
+}
+
+[data-theme="dark"] [id^="filter-"].active {
+  background-color: #6c757d;
+  border-color: #adb5bd;
+  color: var(--text-light);
+}
+
+[data-theme="dark"] [id^="filter-"] .badge {
+  background-color: #495057 !important;
+  color: var(--text-light);
+}
+
+[data-theme="dark"] [id^="filter-"]:hover .badge,
+[data-theme="dark"] [id^="filter-"]:focus .badge,
+[data-theme="dark"] [id^="filter-"].active .badge {
+  background-color: var(--primary-color) !important;
 }
