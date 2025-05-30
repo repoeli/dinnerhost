@@ -43,7 +43,7 @@
   </noscript>
 </head>
 <body>  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg sticky-top bg-white shadow">
+  <nav class="navbar navbar-expand-lg sticky-top shadow">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="#">
         <span class="brand-icon me-2">🍴</span>
@@ -54,8 +54,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       
-      <div class="collapse navbar-collapse" id="mainNav">
-        <ul class="navbar-nav ms-auto align-items-center">
+      <div class="collapse navbar-collapse" id="mainNav">        <ul class="navbar-nav ms-auto align-items-center">
           <li class="nav-item">
             <a class="nav-link active nav-link-hover px-3 mx-1" aria-current="page" href="#">
               <i class="bi bi-house-heart-fill me-1"></i>Home
@@ -70,10 +69,12 @@
             <a class="nav-link nav-link-hover px-3 mx-1" href="guest-dashboard.html">
               <i class="bi bi-bookmark-heart-fill me-1"></i>My Reservations
             </a>
-          </li>          <li class="nav-item mx-2">
+          </li>
+          <li class="nav-item mx-2">
             <button class="btn btn-warning rounded-pill btn-glow host-only auth-dependent" id="hostDinnerBtn">
               <i class="bi bi-plus-circle-fill me-1"></i>Host Dinner
-            </button>            <button class="btn btn-outline-warning btn-hover-glow rounded-pill" id="loginBtn">
+            </button>
+            <button class="btn btn-outline-warning btn-hover-glow rounded-pill" id="loginBtn">
               <i class="bi bi-box-arrow-in-right me-1"></i>Login
             </button>
           </li>
@@ -82,13 +83,24 @@
               <button class="btn btn-light btn-user dropdown-toggle d-flex align-items-center shadow-sm" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-person-circle me-2 text-primary-custom"></i>
                 <span class="user-name">User</span>
-              </button>              <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userDropdown">
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userDropdown">
                 <li><a class="dropdown-item dropdown-item-hover" href="#"><i class="bi bi-person-badge me-2"></i>Profile</a></li>
                 <li><a class="dropdown-item dropdown-item-hover host-only" href="host-dashboard.html"><i class="bi bi-speedometer2 me-2"></i>Host Dashboard</a></li>
                 <li><a class="dropdown-item dropdown-item-hover guest-only" href="guest-dashboard.html"><i class="bi bi-bookmark-heart me-2"></i>My Reservations</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><button class="dropdown-item dropdown-item-hover" id="logoutBtn" data-action="logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</button></li>
               </ul>
+            </div>
+          </li>
+          <li class="nav-item ms-2">
+            <div class="theme-switch-wrapper">
+              <i class="bi bi-sun-fill theme-icon theme-icon-sun"></i>
+              <label class="theme-switch" for="theme-toggle">
+                <input type="checkbox" id="theme-toggle" />
+                <span class="slider"></span>
+              </label>
+              <i class="bi bi-moon-fill theme-icon theme-icon-moon"></i>
             </div>
           </li>
         </ul>
@@ -642,13 +654,13 @@
       document.head.appendChild(link);
     });
   </script>
-  <!-- Essential scripts loaded with priority -->
-  <script src="assets/js/api-config.js" defer></script>
+  <!-- Essential scripts loaded with priority -->  <script src="assets/js/api-config.js" defer></script>
   <script src="assets/js/enhanced-data-utils.js" defer></script>
   <script src="assets/js/script.js" defer></script>
   <!-- login-fix.js is commented out as its functionality has been integrated into script.js to reduce HTTP requests -->
   <!--<script src="assets/js/login-fix.js" defer></script> -->
   <script src="assets/js/heroAnimations.js" defer></script>
+  <script src="assets/js/theme-switcher.js" defer></script>
   
   <!-- Non-critical scripts loaded with lower priority -->
   <script src="assets/js/modal-utils.js" defer></script>

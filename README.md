@@ -244,6 +244,19 @@ The platform is fully responsive and optimized for all device types:
 
 ---
 
+## 🌓 **Light and Dark Mode**  
+The platform now features a professionally implemented light/dark mode toggle that enhances user experience:
+
+✅ **Persistent Preference** - User theme choice is saved between sessions  
+✅ **System Preference Detection** - Automatically matches system preferences on first visit  
+✅ **Accessibility Focused** - Maintains proper contrast ratios in both themes  
+✅ **Seamless Transitions** - Smooth animations when switching between modes  
+✅ **Consistent Design Language** - Maintains visual hierarchy and brand identity in both modes  
+
+Users can toggle between light and dark modes using the sun/moon toggle switch in the navigation bar.
+
+---
+
 ## 🐞 **Known Bugs & Limitations**  
 
 ### ⚠️ **Current Limitations**
