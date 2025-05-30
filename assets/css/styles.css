@@ -788,7 +788,7 @@ nav h1 {
 /* Improved contrast for badges in dark mode */
 [data-theme="dark"] .badge.bg-secondary {
   background-color: #6c757d !important;
-  color: var(--text-light);
+  color: white !important;
 }
 
 /* Improved contrast for text-muted in dark mode */
@@ -807,50 +807,34 @@ nav h1 {
   border-color: var(--border-color);
 }
 
-/* Improved contrast for table in dark mode */
-[data-theme="dark"] .table-light,
-[data-theme="dark"] .table-light > th,
-[data-theme="dark"] .table-light > td {
-  background-color: var(--secondary-bg);
-  color: var(--secondary-text);
+/* Fix for dinner card price text in dark mode */
+[data-theme="dark"] .dinner-card .dinner-price {
+  color: #fd7e14; /* Using the primary orange color for better visibility */
 }
 
-/* Improved contrast for form elements in dark mode */
-[data-theme="dark"] .form-check-input {
-  background-color: var(--secondary-bg);
-  border-color: var(--border-color);
+/* Target the "per person" part specifically */
+[data-theme="dark"] .dinner-card .dinner-price small,
+[data-theme="dark"] .dinner-card .dinner-price .text-muted,
+[data-theme="dark"] .dinner-card .dinner-price span:not(.price-amount) {
+  color: #e0e0e0 !important; /* Using a brighter color for better visibility */
 }
 
-[data-theme="dark"] .form-check-input:checked {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
+/* Ensure dinner card titles are clearly visible */
+[data-theme="dark"] .dinner-card .card-title {
+  color: #ffffff; /* Bright white for maximum contrast */
 }
 
-[data-theme="dark"] .bg-light {
-  background-color: var(--secondary-bg) !important;
-  color: var(--secondary-text);
+/* Enhance visibility of navigation links in dark mode */
+[data-theme="dark"] .nav-link {
+  color: #e0e0e0;
 }
 
-/* Ensure all text elements use appropriate theme color */
-[data-theme="dark"] h1,
-[data-theme="dark"] h2,
-[data-theme="dark"] h3,
-[data-theme="dark"] h4,
-[data-theme="dark"] h5,
-[data-theme="dark"] h6,
-[data-theme="dark"] p,
-[data-theme="dark"] label,
-[data-theme="dark"] .text-dark {
-  color: var(--text-dark);
-}
-
-/* Ensure all links maintain visibility and contrast */
-[data-theme="dark"] a:not(.btn):not(.nav-link) {
+[data-theme="dark"] .nav-link.active {
   color: var(--primary-color);
 }
 
-[data-theme="dark"] a:not(.btn):not(.nav-link):hover {
-  color: var(--primary-color-dark);
+[data-theme="dark"] .nav-link:hover {
+  color: var(--primary-color);
 }
 
 /* ===== STATS COUNTER ===== */
