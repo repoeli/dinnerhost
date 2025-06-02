@@ -78,7 +78,16 @@ The colour palette for the **Dinner Hosting Platform** was carefully chosen to c
 These colours create a **warm and welcoming** atmosphere while maintaining professional readability.
 
 ### Main palette  
-[Add your color palette image here]
+
+**Primary Colour Palette** 
+![Primary Colour Palette](assets/images/palette/Primary.png) 
+
+**Light Theme Colour Palette** 
+![Light Theme](assets/images/palette/Light%20Theme.png) 
+
+**Dark Theme Colour Palette** 
+![Dark Theme](assets/images/palette/Dark%20Theme.png)
+
 
 ### 🔠 **Fonts**  
 The project uses **Bootstrap's default font stack** with **system fonts** for optimal performance and readability across all devices.  
